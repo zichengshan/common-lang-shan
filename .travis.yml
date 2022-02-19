@@ -3,10 +3,7 @@ cache:
   directories:
     - $HOME/.m2
 jdk:
-  - openjdk8
   - openjdk11
-  - openjdk14
-  - openjdk-ea
 
 matrix:
   allow_failures:
