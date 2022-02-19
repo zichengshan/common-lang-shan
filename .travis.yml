@@ -23,5 +23,8 @@ sudo: required
 jdk:
   - openjdk11
   
+# script:
+#   - mvn clean install -DskipTests -Drat.skip=true
+
 script:
-  - mvn clean install -DskipTests -Drat.skip=true
+  - mvn clean install -Drat.numUnapprovedLicenses=100
