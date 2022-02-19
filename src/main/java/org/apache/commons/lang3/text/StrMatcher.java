@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
  * If these do not suffice, you can subclass and implement your own matcher.
  *
  * @since 2.2
- * @deprecated As of 3.6, use Apache Commons Text
+ * @deprecated as of 3.6, use commons-text
  * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/matcher/StringMatcherFactory.html">
  * StringMatcherFactory</a> instead
  */
@@ -213,6 +213,7 @@ public abstract class StrMatcher {
         return new StringMatcher(str);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Constructor.
      */
@@ -270,6 +271,7 @@ public abstract class StrMatcher {
         return isMatch(buffer, pos, 0, buffer.length);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Class used to define a set of characters for matching purposes.
      */
@@ -301,6 +303,7 @@ public abstract class StrMatcher {
         }
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Class used to define a character for matching purposes.
      */
@@ -332,6 +335,7 @@ public abstract class StrMatcher {
         }
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Class used to define a set of characters for matching purposes.
      */
@@ -378,6 +382,7 @@ public abstract class StrMatcher {
 
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Class used to match no characters.
      */
@@ -404,6 +409,7 @@ public abstract class StrMatcher {
         }
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Class used to match whitespace as per trim().
      */

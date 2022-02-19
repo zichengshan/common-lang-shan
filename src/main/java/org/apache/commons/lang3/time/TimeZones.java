@@ -17,8 +17,6 @@
 
 package org.apache.commons.lang3.time;
 
-import java.util.TimeZone;
-
 /**
  * Helps to deal with {@link java.util.TimeZone}s.
  *
@@ -26,7 +24,7 @@ import java.util.TimeZone;
  */
 public class TimeZones {
 
-    // Do not instantiate.
+    // do not instantiate
     private TimeZones() {
     }
 
@@ -34,11 +32,4 @@ public class TimeZones {
      * A public version of {@link java.util.TimeZone}'s package private {@code GMT_ID} field.
      */
     public static final String GMT_ID = "GMT";
-
-    /**
-     * The GMT time zone.
-     *
-     * @since 3.13.0
-     */
-    public static final TimeZone GMT = TimeZone.getTimeZone(GMT_ID);
 }

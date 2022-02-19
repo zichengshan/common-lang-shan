@@ -149,6 +149,7 @@ public class DateUtils {
     public DateUtils() {
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Checks if two date objects are on the same day ignoring time.</p>
      *
@@ -195,6 +196,7 @@ public class DateUtils {
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Checks if two date objects represent the same instant in time.</p>
      *
@@ -231,6 +233,7 @@ public class DateUtils {
         return cal1.getTime().getTime() == cal2.getTime().getTime();
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Checks if two calendar objects represent the same local time.</p>
      *
@@ -257,6 +260,7 @@ public class DateUtils {
                 cal1.getClass() == cal2.getClass();
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Parses a string representing a date by trying a variety of different parsers.</p>
      *
@@ -275,6 +279,7 @@ public class DateUtils {
         return parseDate(str, null, parsePatterns);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Parses a string representing a date by trying a variety of different parsers,
      * using the default date format symbols for the given locale.</p>
@@ -297,6 +302,7 @@ public class DateUtils {
         return parseDateWithLeniency(str, locale, parsePatterns, true);
     }
 
+  //-----------------------------------------------------------------------
     /**
      * <p>Parses a string representing a date by trying a variety of different parsers.</p>
      *
@@ -382,6 +388,7 @@ public class DateUtils {
         throw new ParseException("Unable to parse the date: " + str, -1);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Adds a number of years to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -395,6 +402,7 @@ public class DateUtils {
         return add(date, Calendar.YEAR, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Adds a number of months to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -408,6 +416,7 @@ public class DateUtils {
         return add(date, Calendar.MONTH, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Adds a number of weeks to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -421,6 +430,7 @@ public class DateUtils {
         return add(date, Calendar.WEEK_OF_YEAR, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Adds a number of days to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -434,6 +444,7 @@ public class DateUtils {
         return add(date, Calendar.DAY_OF_MONTH, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Adds a number of hours to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -447,6 +458,7 @@ public class DateUtils {
         return add(date, Calendar.HOUR_OF_DAY, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Adds a number of minutes to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -460,6 +472,7 @@ public class DateUtils {
         return add(date, Calendar.MINUTE, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Adds a number of seconds to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -473,6 +486,7 @@ public class DateUtils {
         return add(date, Calendar.SECOND, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Adds a number of milliseconds to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -486,6 +500,7 @@ public class DateUtils {
         return add(date, Calendar.MILLISECOND, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Adds to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -504,6 +519,7 @@ public class DateUtils {
         return c.getTime();
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Sets the years field to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -518,6 +534,7 @@ public class DateUtils {
         return set(date, Calendar.YEAR, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Sets the months field to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -532,6 +549,7 @@ public class DateUtils {
         return set(date, Calendar.MONTH, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Sets the day of month field to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -546,6 +564,7 @@ public class DateUtils {
         return set(date, Calendar.DAY_OF_MONTH, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Sets the hours field to a date returning a new object.  Hours range
      * from  0-23.
@@ -561,6 +580,7 @@ public class DateUtils {
         return set(date, Calendar.HOUR_OF_DAY, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Sets the minute field to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -575,6 +595,7 @@ public class DateUtils {
         return set(date, Calendar.MINUTE, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Sets the seconds field to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -589,6 +610,7 @@ public class DateUtils {
         return set(date, Calendar.SECOND, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Sets the milliseconds field to a date returning a new object.
      * The original {@code Date} is unchanged.
@@ -603,6 +625,7 @@ public class DateUtils {
         return set(date, Calendar.MILLISECOND, amount);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Sets the specified field to a date returning a new object.
      * This does not use a lenient calendar.
@@ -625,6 +648,7 @@ public class DateUtils {
         return c.getTime();
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Converts a {@code Date} into a {@code Calendar}.
      *
@@ -639,6 +663,7 @@ public class DateUtils {
         return c;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Converts a {@code Date} of a given {@code TimeZone} into a {@code Calendar}
      * @param date the date to convert to a Calendar
@@ -652,6 +677,7 @@ public class DateUtils {
         return c;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Rounds a date, leaving the field specified as the most
      * significant field.</p>
@@ -760,13 +786,14 @@ public class DateUtils {
         }
         if (date instanceof Date) {
             return round((Date) date, field);
-        }
-        if (date instanceof Calendar) {
+        } else if (date instanceof Calendar) {
             return round((Calendar) date, field).getTime();
+        } else {
+            throw new ClassCastException("Could not round " + date);
         }
-        throw new ClassCastException("Could not round " + date);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Truncates a date, leaving the field specified as the most
      * significant field.</p>
@@ -836,13 +863,14 @@ public class DateUtils {
         }
         if (date instanceof Date) {
             return truncate((Date) date, field);
-        }
-        if (date instanceof Calendar) {
+        } else if (date instanceof Calendar) {
             return truncate((Calendar) date, field).getTime();
+        } else {
+            throw new ClassCastException("Could not truncate " + date);
         }
-        throw new ClassCastException("Could not truncate " + date);
     }
 
+  //-----------------------------------------------------------------------
     /**
      * <p>Gets a date ceiling, leaving the field specified as the most
      * significant field.</p>
@@ -915,13 +943,14 @@ public class DateUtils {
         }
         if (date instanceof Date) {
             return ceiling((Date) date, field);
-        }
-        if (date instanceof Calendar) {
+        } else if (date instanceof Calendar) {
             return ceiling((Calendar) date, field).getTime();
+        } else {
+            throw new ClassCastException("Could not find ceiling of for type: " + date.getClass());
         }
-        throw new ClassCastException("Could not find ceiling of for type: " + date.getClass());
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Internal calculation method.</p>
      *
@@ -1070,6 +1099,7 @@ public class DateUtils {
 
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Constructs an {@code Iterator} over each day in a date
      * range defined by a focus date and range style.</p>
@@ -1129,8 +1159,8 @@ public class DateUtils {
         if (focus == null) {
             throw nullDateIllegalArgumentException();
         }
-        final Calendar start;
-        final Calendar end;
+        Calendar start = null;
+        Calendar end = null;
         int startCutoff = Calendar.SUNDAY;
         int endCutoff = Calendar.SATURDAY;
         switch (rangeStyle) {
@@ -1221,11 +1251,11 @@ public class DateUtils {
         }
         if (focus instanceof Date) {
             return iterator((Date) focus, rangeStyle);
-        }
-        if (focus instanceof Calendar) {
+        } else if (focus instanceof Calendar) {
             return iterator((Calendar) focus, rangeStyle);
+        } else {
+            throw new ClassCastException("Could not iterate based on " + focus);
         }
-        throw new ClassCastException("Could not iterate based on " + focus);
     }
 
     /**
@@ -1759,6 +1789,7 @@ public class DateUtils {
         Validate.notNull(date, "date");
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Date iterator.</p>
      */

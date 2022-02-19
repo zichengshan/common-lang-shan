@@ -36,7 +36,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.commons.lang3.ClassUtils.Interfaces;
 import org.apache.commons.lang3.reflect.testbed.GenericConsumer;
@@ -132,6 +131,7 @@ public class ClassUtilsTest  {
         assertNull(ClassUtils.convertClassesToClassNames(null));
     }
 
+    // -------------------------------------------------------------------------
     @Test
     public void test_convertClassNamesToClasses_List() {
         final List<String> list = new ArrayList<>();
@@ -156,6 +156,7 @@ public class ClassUtilsTest  {
         assertNull(ClassUtils.convertClassNamesToClasses(null));
     }
 
+    // -------------------------------------------------------------------------
     @Test
     public void test_getAbbreviatedName_Class() {
         assertEquals("", ClassUtils.getAbbreviatedName((Class<?>) null, 1));
@@ -165,6 +166,19 @@ public class ClassUtilsTest  {
         assertEquals("j.lang.String", ClassUtils.getAbbreviatedName(String.class, 13));
         assertEquals("j.lang.String", ClassUtils.getAbbreviatedName(String.class, 15));
         assertEquals("java.lang.String", ClassUtils.getAbbreviatedName(String.class, 20));
+    }
+
+    /**
+     * Test that in case the required length is larger than the name and thus there is no need for any shortening
+     * then the returned string object is the same as the one passed as argument. Note, however, that this is
+     * tested as an internal implementation detail, but it is not a guaranteed feature of the implementation.
+     */
+    @Test
+    @DisplayName("When the length hint is longer than the actual length then the same String object is returned")
+    public void test_getAbbreviatedName_TooLongHint(){
+        final String className = "java.lang.String";
+        Assertions.assertSame(className, ClassUtils.getAbbreviatedName(className, className.length()+1));
+        Assertions.assertSame(className, ClassUtils.getAbbreviatedName(className, className.length()));
     }
 
     @Test
@@ -203,19 +217,6 @@ public class ClassUtilsTest  {
         assertEquals("j.l.String", ClassUtils.getAbbreviatedName("java.lang.String", "j.l.String".length() - 1));
     }
 
-    /**
-     * Test that in case the required length is larger than the name and thus there is no need for any shortening
-     * then the returned string object is the same as the one passed as argument. Note, however, that this is
-     * tested as an internal implementation detail, but it is not a guaranteed feature of the implementation.
-     */
-    @Test
-    @DisplayName("When the length hint is longer than the actual length then the same String object is returned")
-    public void test_getAbbreviatedName_TooLongHint(){
-        final String className = "java.lang.String";
-        Assertions.assertSame(className, ClassUtils.getAbbreviatedName(className, className.length()+1));
-        Assertions.assertSame(className, ClassUtils.getAbbreviatedName(className, className.length()));
-    }
-
     @Test
     public void test_getAllInterfaces_Class() {
         final List<?> list = ClassUtils.getAllInterfaces(CY.class);
@@ -230,6 +231,7 @@ public class ClassUtilsTest  {
         assertNull(ClassUtils.getAllInterfaces(null));
     }
 
+    // -------------------------------------------------------------------------
     @Test
     public void test_getAllSuperclasses_Class() {
         final List<?> list = ClassUtils.getAllSuperclasses(CY.class);
@@ -489,6 +491,7 @@ public class ClassUtilsTest  {
         assertEquals("org.apache.commons.lang3", ClassUtils.getPackageName(Named.class));
     }
 
+    // -------------------------------------------------------------------------
     @Test
     public void test_getPackageName_Object() {
         assertEquals("org.apache.commons.lang3", ClassUtils.getPackageName(new ClassUtils(), "<null>"));
@@ -628,6 +631,7 @@ public class ClassUtilsTest  {
         assertEquals("ClassUtilsTest.Inner", ClassUtils.getShortClassName(Inner.class));
     }
 
+    // -------------------------------------------------------------------------
     @Test
     public void test_getShortClassName_Object() {
         assertEquals("ClassUtils", ClassUtils.getShortClassName(new ClassUtils(), "<null>"));
@@ -769,6 +773,7 @@ public class ClassUtilsTest  {
         assertTrue(ClassUtils.isAssignable(Boolean.class, Boolean.class, true));
     }
 
+    // -------------------------------------------------------------------------
     @Test
     public void test_isAssignable_ClassArray_ClassArray() {
         final Class<?>[] array2 = new Class[] {Object.class, Object.class};
@@ -1126,6 +1131,7 @@ public class ClassUtilsTest  {
         assertTrue(ClassUtils.isAssignable(Boolean.TYPE, Boolean.TYPE), "boolean -> boolean");
     }
 
+    // -------------------------------------------------------------------------
     @Test
     public void test_isInnerClass_Class() {
         assertTrue(ClassUtils.isInnerClass(Inner.class));
@@ -1138,24 +1144,7 @@ public class ClassUtilsTest  {
         assertFalse(ClassUtils.isInnerClass(null));
     }
 
-    @Test
-    public void testComparable() {
-        final TreeMap<Class<?>, String> map = new TreeMap<>(ClassUtils.comparator());
-        map.put(String.class, "lastEntry");
-        map.toString();
-        map.put(Character.class, "firstEntry");
-        map.toString();
-        assertEquals("firstEntry", map.firstEntry().getValue());
-        assertEquals(Character.class, map.firstEntry().getKey());
-        //
-        assertEquals("lastEntry", map.lastEntry().getValue());
-        assertEquals(String.class, map.lastEntry().getKey());
-        //
-        map.put(null, "null");
-        map.toString();
-        assertEquals("null", map.get(null));
-    }
-
+    //-----------------------------------------------------------------------
     @Test
     public void testConstructor() {
         assertNotNull(new ClassUtils());
@@ -1251,17 +1240,6 @@ public class ClassUtilsTest  {
         assertGetClassReturnsClass( float[][].class );
         assertGetClassReturnsClass( double[][].class );
         assertGetClassReturnsClass( boolean[][].class );
-    }
-
-    @Test
-    public void testGetComponentType() {
-        final CX[] newArray = {};
-        @SuppressWarnings("unchecked")
-        final Class<CX[]> classCxArray = (Class<CX[]>) newArray.getClass();
-        // No type-cast required.
-        final Class<CX> componentType = ClassUtils.getComponentType(classCxArray);
-        assertEquals(CX.class, componentType);
-        assertNull(ClassUtils.getComponentType(null));
     }
 
     @Test

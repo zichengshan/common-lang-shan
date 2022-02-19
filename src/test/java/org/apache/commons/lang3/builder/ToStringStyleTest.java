@@ -30,6 +30,7 @@ public class ToStringStyleTest {
 
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testSetArrayStart() {
         final ToStringStyle style = new ToStringStyleImpl();

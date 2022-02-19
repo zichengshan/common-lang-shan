@@ -38,7 +38,7 @@ public class BooleanUtilsTest {
 
     @Test
     public void test_booleanValues() {
-        final Boolean[] expected = {false, true};
+        final Boolean[] expected = new Boolean[] {false, true};
         assertArrayEquals(sort(expected), BooleanUtils.booleanValues());
     }
 
@@ -436,12 +436,12 @@ public class BooleanUtilsTest {
 
     @Test
     public void testAnd_object_nullElementInput() {
-        assertEquals(Boolean.FALSE, BooleanUtils.and(new Boolean[] {null}));
+        assertThrows(IllegalArgumentException.class, () -> BooleanUtils.and(new Boolean[] {null}));
     }
 
     @Test
     public void testAnd_object_nullInput() {
-        assertThrows(NullPointerException.class, () -> BooleanUtils.and((Boolean[]) null));
+        assertThrows(IllegalArgumentException.class, () -> BooleanUtils.and((Boolean[]) null));
     }
 
     @Test
@@ -452,20 +452,20 @@ public class BooleanUtilsTest {
                     .booleanValue(),
                 "False result for (true, true)");
 
-        assertFalse(
-                BooleanUtils
+        assertTrue(
+                ! BooleanUtils
                     .and(new Boolean[] { Boolean.FALSE, Boolean.FALSE })
                     .booleanValue(),
                 "True result for (false, false)");
 
-        assertFalse(
-                BooleanUtils
+        assertTrue(
+                ! BooleanUtils
                     .and(new Boolean[] { Boolean.TRUE, Boolean.FALSE })
                     .booleanValue(),
                 "True result for (true, false)");
 
-        assertFalse(
-                BooleanUtils
+        assertTrue(
+                ! BooleanUtils
                     .and(new Boolean[] { Boolean.FALSE, Boolean.TRUE })
                     .booleanValue(),
                 "True result for (false, true)");
@@ -473,8 +473,8 @@ public class BooleanUtilsTest {
 
     @Test
     public void testAnd_object_validInput_3items() {
-        assertFalse(
-                BooleanUtils
+        assertTrue(
+                ! BooleanUtils
                     .and(
                         new Boolean[] {
                             Boolean.FALSE,
@@ -483,8 +483,8 @@ public class BooleanUtilsTest {
                             .booleanValue(),
                 "True result for (false, false, true)");
 
-        assertFalse(
-                BooleanUtils
+        assertTrue(
+                ! BooleanUtils
                     .and(
                         new Boolean[] {
                             Boolean.FALSE,
@@ -493,8 +493,8 @@ public class BooleanUtilsTest {
                             .booleanValue(),
                 "True result for (false, true, false)");
 
-        assertFalse(
-                BooleanUtils
+        assertTrue(
+                ! BooleanUtils
                     .and(
                         new Boolean[] {
                             Boolean.TRUE,
@@ -509,8 +509,8 @@ public class BooleanUtilsTest {
                     .booleanValue(),
                 "False result for (true, true, true)");
 
-        assertFalse(
-                BooleanUtils.and(
+        assertTrue(
+                ! BooleanUtils.and(
                         new Boolean[] {
                             Boolean.FALSE,
                             Boolean.FALSE,
@@ -518,8 +518,8 @@ public class BooleanUtilsTest {
                             .booleanValue(),
                 "True result for (false, false)");
 
-        assertFalse(
-                BooleanUtils.and(
+        assertTrue(
+                ! BooleanUtils.and(
                         new Boolean[] {
                             Boolean.TRUE,
                             Boolean.TRUE,
@@ -527,8 +527,8 @@ public class BooleanUtilsTest {
                             .booleanValue(),
                 "True result for (true, true, false)");
 
-        assertFalse(
-                BooleanUtils.and(
+        assertTrue(
+                ! BooleanUtils.and(
                         new Boolean[] {
                             Boolean.TRUE,
                             Boolean.FALSE,
@@ -536,8 +536,8 @@ public class BooleanUtilsTest {
                             .booleanValue(),
                 "True result for (true, false, true)");
 
-        assertFalse(
-                BooleanUtils.and(
+        assertTrue(
+                ! BooleanUtils.and(
                         new Boolean[] {
                             Boolean.FALSE,
                             Boolean.TRUE,
@@ -553,7 +553,7 @@ public class BooleanUtilsTest {
 
     @Test
     public void testAnd_primitive_nullInput() {
-        assertThrows(NullPointerException.class, () -> BooleanUtils.and((boolean[]) null));
+        assertThrows(IllegalArgumentException.class, () -> BooleanUtils.and((boolean[]) null));
     }
 
     @Test
@@ -562,51 +562,51 @@ public class BooleanUtilsTest {
                 BooleanUtils.and(new boolean[] { true, true }),
                 "False result for (true, true)");
 
-        assertFalse(
-                BooleanUtils.and(new boolean[] { false, false }),
+        assertTrue(
+                ! BooleanUtils.and(new boolean[] { false, false }),
                 "True result for (false, false)");
 
-        assertFalse(
-                BooleanUtils.and(new boolean[] { true, false }),
+        assertTrue(
+                ! BooleanUtils.and(new boolean[] { true, false }),
                 "True result for (true, false)");
 
-        assertFalse(
-                BooleanUtils.and(new boolean[] { false, true }),
+        assertTrue(
+                ! BooleanUtils.and(new boolean[] { false, true }),
                 "True result for (false, true)");
     }
 
     @Test
     public void testAnd_primitive_validInput_3items() {
-        assertFalse(
-                BooleanUtils.and(new boolean[] { false, false, true }),
+        assertTrue(
+                ! BooleanUtils.and(new boolean[] { false, false, true }),
                 "True result for (false, false, true)");
 
-        assertFalse(
-                BooleanUtils.and(new boolean[] { false, true, false }),
+        assertTrue(
+                ! BooleanUtils.and(new boolean[] { false, true, false }),
                 "True result for (false, true, false)");
 
-        assertFalse(
-                BooleanUtils.and(new boolean[] { true, false, false }),
+        assertTrue(
+                ! BooleanUtils.and(new boolean[] { true, false, false }),
                 "True result for (true, false, false)");
 
         assertTrue(
                 BooleanUtils.and(new boolean[] { true, true, true }),
                 "False result for (true, true, true)");
 
-        assertFalse(
-                BooleanUtils.and(new boolean[] { false, false, false }),
+        assertTrue(
+                ! BooleanUtils.and(new boolean[] { false, false, false }),
                 "True result for (false, false)");
 
-        assertFalse(
-                BooleanUtils.and(new boolean[] { true, true, false }),
+        assertTrue(
+                ! BooleanUtils.and(new boolean[] { true, true, false }),
                 "True result for (true, true, false)");
 
-        assertFalse(
-                BooleanUtils.and(new boolean[] { true, false, true }),
+        assertTrue(
+                ! BooleanUtils.and(new boolean[] { true, false, true }),
                 "True result for (true, false, true)");
 
-        assertFalse(
-                BooleanUtils.and(new boolean[] { false, true, true }),
+        assertTrue(
+                ! BooleanUtils.and(new boolean[] { false, true, true }),
                 "True result for (false, true, true)");
     }
 
@@ -635,12 +635,12 @@ public class BooleanUtilsTest {
 
     @Test
     public void testOr_object_nullElementInput() {
-        assertEquals(Boolean.FALSE, BooleanUtils.or(new Boolean[] {null}));
+        assertThrows(IllegalArgumentException.class, () -> BooleanUtils.or(new Boolean[] {null}));
     }
 
     @Test
     public void testOr_object_nullInput() {
-        assertThrows(NullPointerException.class, () -> BooleanUtils.or((Boolean[]) null));
+        assertThrows(IllegalArgumentException.class, () -> BooleanUtils.or((Boolean[]) null));
     }
 
     @Test
@@ -651,8 +651,8 @@ public class BooleanUtilsTest {
                     .booleanValue(),
                 "False result for (true, true)");
 
-        assertFalse(
-                BooleanUtils
+        assertTrue(
+                ! BooleanUtils
                     .or(new Boolean[] { Boolean.FALSE, Boolean.FALSE })
                     .booleanValue(),
                 "True result for (false, false)");
@@ -708,8 +708,8 @@ public class BooleanUtilsTest {
                     .booleanValue(),
                 "False result for (true, true, true)");
 
-        assertFalse(
-                BooleanUtils.or(
+        assertTrue(
+                ! BooleanUtils.or(
                         new Boolean[] {
                             Boolean.FALSE,
                             Boolean.FALSE,
@@ -752,7 +752,7 @@ public class BooleanUtilsTest {
 
     @Test
     public void testOr_primitive_nullInput() {
-        assertThrows(NullPointerException.class, () -> BooleanUtils.or((boolean[]) null));
+        assertThrows(IllegalArgumentException.class, () -> BooleanUtils.or((boolean[]) null));
     }
 
     @Test
@@ -761,8 +761,8 @@ public class BooleanUtilsTest {
                 BooleanUtils.or(new boolean[] { true, true }),
                 "False result for (true, true)");
 
-        assertFalse(
-                BooleanUtils.or(new boolean[] { false, false }),
+        assertTrue(
+                ! BooleanUtils.or(new boolean[] { false, false }),
                 "True result for (false, false)");
 
         assertTrue(
@@ -792,8 +792,8 @@ public class BooleanUtilsTest {
                 BooleanUtils.or(new boolean[] { true, true, true }),
                 "False result for (true, true, true)");
 
-        assertFalse(
-                BooleanUtils.or(new boolean[] { false, false, false }),
+        assertTrue(
+                ! BooleanUtils.or(new boolean[] { false, false, false }),
                 "True result for (false, false)");
 
         assertTrue(
@@ -817,12 +817,12 @@ public class BooleanUtilsTest {
 
     @Test
     public void testXor_object_nullElementInput() {
-        assertEquals(Boolean.FALSE, BooleanUtils.xor(new Boolean[] {null}));
+        assertThrows(IllegalArgumentException.class, () -> BooleanUtils.xor(new Boolean[] {null}));
     }
 
     @Test
     public void testXor_object_nullInput() {
-        assertThrows(NullPointerException.class, () -> BooleanUtils.xor((Boolean[]) null));
+        assertThrows(IllegalArgumentException.class, () -> BooleanUtils.xor((Boolean[]) null));
     }
     @Test
     public void testXor_object_validInput_2items() {
@@ -940,7 +940,7 @@ public class BooleanUtilsTest {
 
     @Test
     public void testXor_primitive_nullInput() {
-        assertThrows(NullPointerException.class, () -> BooleanUtils.xor((boolean[]) null));
+        assertThrows(IllegalArgumentException.class, () -> BooleanUtils.xor((boolean[]) null));
     }
 
     @Test

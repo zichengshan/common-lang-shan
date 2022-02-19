@@ -138,17 +138,21 @@ public class SerializationUtils {
         final byte[] objectData = serialize(object);
         final ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
 
-        final Class<T> cls = ObjectUtils.getClass(object);
-        try (ClassLoaderAwareObjectInputStream in = new ClassLoaderAwareObjectInputStream(bais, cls.getClassLoader())) {
+        try (ClassLoaderAwareObjectInputStream in = new ClassLoaderAwareObjectInputStream(bais,
+                object.getClass().getClassLoader())) {
             /*
-             * when we serialize and deserialize an object, it is reasonable to assume the deserialized object is of the
-             * same type as the original serialized object
+             * when we serialize and deserialize an object,
+             * it is reasonable to assume the deserialized object
+             * is of the same type as the original serialized object
              */
-            return cls.cast(in.readObject());
+            @SuppressWarnings("unchecked") // see above
+            final T readObject = (T) in.readObject();
+            return readObject;
 
-        } catch (final ClassNotFoundException | IOException ex) {
-            throw new SerializationException(
-                String.format("%s while reading cloned object data", ex.getClass().getSimpleName()), ex);
+        } catch (final ClassNotFoundException ex) {
+            throw new SerializationException("ClassNotFoundException while reading cloned object data", ex);
+        } catch (final IOException ex) {
+            throw new SerializationException("IOException while reading or closing cloned object data", ex);
         }
     }
 

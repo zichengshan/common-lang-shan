@@ -58,7 +58,9 @@ public class CharUtils {
     public static final char NUL = '\0';
 
     static {
-        ArrayUtils.setAll(CHAR_STRING_ARRAY, i -> String.valueOf((char) i));
+        for (char c = 0; c < CHAR_STRING_ARRAY.length; c++) {
+            CHAR_STRING_ARRAY[c] = String.valueOf(c);
+        }
     }
 
     /**
@@ -71,6 +73,7 @@ public class CharUtils {
     public CharUtils() {
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Converts the character to a Character.</p>
      *
@@ -115,6 +118,7 @@ public class CharUtils {
         return Character.valueOf(str.charAt(0));
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Converts the Character to a char throwing an exception for {@code null}.</p>
      *
@@ -153,6 +157,7 @@ public class CharUtils {
         return ch.charValue();
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Converts the String to a char using the first character, throwing
      * an exception on empty Strings.</p>
@@ -196,6 +201,7 @@ public class CharUtils {
         return str.charAt(0);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Converts the character to the Integer it represents, throwing an
      * exception if the character is not numeric.</p>
@@ -285,6 +291,7 @@ public class CharUtils {
         return toIntValue(ch.charValue(), defaultValue);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Converts the character to a String that contains the one character.</p>
      *
@@ -300,10 +307,10 @@ public class CharUtils {
      * @return a String containing the one specified character
      */
     public static String toString(final char ch) {
-        if (ch < CHAR_STRING_ARRAY.length) {
+        if (ch < 128) {
             return CHAR_STRING_ARRAY[ch];
         }
-        return String.valueOf(ch);
+        return new String(new char[] {ch});
     }
 
     /**

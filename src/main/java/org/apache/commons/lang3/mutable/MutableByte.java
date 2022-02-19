@@ -74,6 +74,7 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
         this.value = Byte.parseByte(value);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Gets the value as a Byte instance.
      *
@@ -104,6 +105,7 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
         this.value = value.byteValue();
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Increments the value.
      *
@@ -172,6 +174,7 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
         return value;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Adds a value to the value of this instance.
      *
@@ -270,6 +273,7 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
         return last;
     }
 
+    //-----------------------------------------------------------------------
     // shortValue relies on Number implementation
     /**
      * Returns the value of this MutableByte as a byte.
@@ -321,6 +325,7 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
         return value;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Gets this mutable as an instance of Byte.
      *
@@ -330,6 +335,7 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
         return Byte.valueOf(byteValue());
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Compares this object to the specified object. The result is {@code true} if and only if the argument is
      * not {@code null} and is a {@code MutableByte} object that contains the same {@code byte} value
@@ -356,6 +362,7 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
         return value;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Compares this mutable to another in ascending order.
      *
@@ -367,6 +374,7 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
         return NumberUtils.compare(this.value, other.value);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Returns the String value of this mutable.
      *

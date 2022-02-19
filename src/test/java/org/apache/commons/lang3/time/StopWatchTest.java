@@ -143,7 +143,7 @@ public class StopWatchTest {
     @Test
     public void testFormatSplitTime() throws InterruptedException {
         final StopWatch watch = StopWatch.createStarted();
-        ThreadUtils.sleepQuietly(MIN_SLEEP_MILLISECONDS);
+        Thread.sleep(MIN_SLEEP_MILLISECONDS);
         watch.split();
         final String formatSplitTime = watch.formatSplitTime();
         assertNotEquals(ZERO_TIME_ELAPSED, formatSplitTime);
@@ -154,7 +154,7 @@ public class StopWatchTest {
     public void testFormatSplitTimeWithMessage() throws InterruptedException {
         final StopWatch watch = new StopWatch(MESSAGE);
         watch.start();
-        ThreadUtils.sleepQuietly(MIN_SLEEP_MILLISECONDS);
+        Thread.sleep(MIN_SLEEP_MILLISECONDS);
         watch.split();
         final String formatSplitTime = watch.formatSplitTime();
         assertFalse(formatSplitTime.startsWith(MESSAGE), formatSplitTime);
@@ -216,20 +216,6 @@ public class StopWatchTest {
     }
 
     @Test
-    public void testStopTimeSimple() throws InterruptedException {
-        final StopWatch watch = StopWatch.createStarted();
-        final long testStartMillis = System.currentTimeMillis();
-        sleepQuietly(MILLIS_550);
-        watch.stop();
-        final long testEndMillis = System.currentTimeMillis();
-        final long stopTime = watch.getStopTime();
-        assertEquals(stopTime, watch.getStopTime());
-
-        assertTrue(stopTime >= testStartMillis);
-        assertTrue(stopTime <= testEndMillis);
-    }
-
-    @Test
     public void testStopWatchGetWithTimeUnit() {
         // Create a mock StopWatch with a time of 2:59:01.999
         // @formatter:off
@@ -259,6 +245,20 @@ public class StopWatchTest {
 
         watch.reset();
         assertEquals(0, watch.getTime());
+    }
+
+    @Test
+    public void testStopTimeSimple() throws InterruptedException {
+        final StopWatch watch = StopWatch.createStarted();
+        final long testStartMillis = System.currentTimeMillis();
+        sleepQuietly(MILLIS_550);
+        watch.stop();
+        final long testEndMillis = System.currentTimeMillis();
+        final long stopTime = watch.getStopTime();
+        assertEquals(stopTime, watch.getStopTime());
+
+        assertTrue(stopTime >= testStartMillis);
+        assertTrue(stopTime <= testEndMillis);
     }
 
     @Test

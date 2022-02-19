@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.Objects;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Assists in implementing {@link java.lang.Comparable#compareTo(Object)} methods.
@@ -112,6 +111,7 @@ public class CompareToBuilder implements Builder<Integer> {
         comparison = 0;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Compares two {@code Object}s via reflection.</p>
      *
@@ -336,6 +336,7 @@ public class CompareToBuilder implements Builder<Integer> {
         }
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Appends to the {@code builder} the {@code compareTo(Object)}
      * result of the superclass.</p>
@@ -352,6 +353,7 @@ public class CompareToBuilder implements Builder<Integer> {
         return this;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Appends to the {@code builder} the comparison of
      * two {@code Object}s.</p>
@@ -415,7 +417,7 @@ public class CompareToBuilder implements Builder<Integer> {
             comparison = 1;
             return this;
         }
-        if (ObjectUtils.isArray(lhs)) {
+        if (lhs.getClass().isArray()) {
             // factor out array case in order to keep method small enough to be inlined
             appendArray(lhs, rhs, comparator);
         } else // the simple case, not an array, just test the element
@@ -604,6 +606,7 @@ public class CompareToBuilder implements Builder<Integer> {
         return this;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Appends to the {@code builder} the deep comparison of
      * two {@code Object} arrays.</p>
@@ -996,6 +999,7 @@ public class CompareToBuilder implements Builder<Integer> {
         return this;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Returns a negative integer, a positive integer, or zero as
      * the {@code builder} has judged the "left-hand" side

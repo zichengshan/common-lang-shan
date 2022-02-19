@@ -68,6 +68,7 @@ public class DurationFormatUtils {
      */
     public static final String ISO_EXTENDED_FORMAT_PATTERN = "'P'yyyy'Y'M'M'd'DT'H'H'm'M's.SSS'S'";
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Formats the time gap as a string.</p>
      *
@@ -221,6 +222,7 @@ public class DurationFormatUtils {
         return duration.trim();
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Formats the time gap as a string.</p>
      *
@@ -405,6 +407,7 @@ public class DurationFormatUtils {
         return format(tokens, years, months, days, hours, minutes, seconds, milliseconds, padWithZeros);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>The internal method to do the formatting.</p>
      *
@@ -567,7 +570,7 @@ public class DurationFormatUtils {
     static class Token {
 
         /** Empty array. */
-        private static final Token[] EMPTY_ARRAY = {};
+        private static final Token[] EMPTY_ARRAY = new Token[0];
 
         /**
          * Helper method to determine if a set of tokens contain a value
@@ -653,11 +656,11 @@ public class DurationFormatUtils {
                 }
                 if (this.value instanceof StringBuilder) {
                     return this.value.toString().equals(tok2.value.toString());
-                }
-                if (this.value instanceof Number) {
+                } else if (this.value instanceof Number) {
                     return this.value.equals(tok2.value);
+                } else {
+                    return this.value == tok2.value;
                 }
-                return this.value == tok2.value;
             }
             return false;
         }

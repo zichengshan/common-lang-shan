@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
  */
 public class CharRangeTest  {
 
+    //-----------------------------------------------------------------------
     @Test
     public void testClass() {
         // class changed to non-public in 3.0
@@ -43,6 +44,7 @@ public class CharRangeTest  {
         assertTrue(Modifier.isFinal(CharRange.class.getModifiers()));
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testConstructorAccessors_is() {
         final CharRange rangea = CharRange.is('a');
@@ -115,6 +117,7 @@ public class CharRangeTest  {
         assertEquals("^a-e", rangea.toString());
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testEquals_Object() {
         final CharRange rangea = CharRange.is('a');
@@ -159,6 +162,7 @@ public class CharRangeTest  {
         assertNotEquals(rangenotbf.hashCode(), rangeae.hashCode());
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testContains_Char() {
         CharRange range = CharRange.is('c');
@@ -188,6 +192,7 @@ public class CharRangeTest  {
         assertTrue(range.contains(Character.MAX_VALUE));
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testContains_Charrange() {
         final CharRange a = CharRange.is('a');
@@ -362,6 +367,7 @@ public class CharRangeTest  {
         assertThrows(NoSuchElementException.class, notLastIt::next);
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testSerialization() {
         CharRange range = CharRange.is('a');
@@ -372,6 +378,7 @@ public class CharRangeTest  {
         assertEquals(range, SerializationUtils.clone(range));
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testIteratorRemove() {
         final CharRange a = CharRange.is('a');

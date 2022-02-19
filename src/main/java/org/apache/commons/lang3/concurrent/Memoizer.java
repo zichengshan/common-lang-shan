@@ -150,10 +150,10 @@ public class Memoizer<I, O> implements Computable<I, O> {
     private RuntimeException launderException(final Throwable throwable) {
         if (throwable instanceof RuntimeException) {
             return (RuntimeException) throwable;
-        }
-        if (throwable instanceof Error) {
+        } else if (throwable instanceof Error) {
             throw (Error) throwable;
+        } else {
+            throw new IllegalStateException("Unchecked exception", throwable);
         }
-        throw new IllegalStateException("Unchecked exception", throwable);
     }
 }

@@ -269,6 +269,7 @@ public class ConcurrentUtilsTest {
                 null));
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Tests initialize() for a null argument.
      *
@@ -351,6 +352,7 @@ public class ConcurrentUtilsTest {
         EasyMock.verify(init);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Tests constant future.
      *
@@ -387,6 +389,7 @@ public class ConcurrentUtilsTest {
         assertFalse(test.cancel(false));
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Tests putIfAbsent() if the map contains the key in question.
      */

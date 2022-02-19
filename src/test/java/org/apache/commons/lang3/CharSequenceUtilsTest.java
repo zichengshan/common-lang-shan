@@ -41,6 +41,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 public class CharSequenceUtilsTest {
 
+    //-----------------------------------------------------------------------
     @Test
     public void testConstructor() {
         assertNotNull(new CharSequenceUtils());
@@ -51,6 +52,7 @@ public class CharSequenceUtilsTest {
         assertFalse(Modifier.isFinal(CharSequenceUtils.class.getModifiers()));
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testSubSequence() {
         //

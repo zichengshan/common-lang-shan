@@ -26,7 +26,7 @@ import org.apache.commons.lang3.ArrayUtils;
  * the first translator consumes codepoints from the input.
  *
  * @since 3.0
- * @deprecated As of 3.6, use Apache Commons Text
+ * @deprecated as of 3.6, use commons-text
  * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/translate/AggregateTranslator.html">
  * AggregateTranslator</a> instead
  */

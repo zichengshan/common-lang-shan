@@ -20,11 +20,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * <p>Utility library to provide helper methods for Java enums.</p>
@@ -35,10 +33,10 @@ import java.util.stream.Stream;
  */
 public class EnumUtils {
 
-    private static final String CANNOT_STORE_S_S_VALUES_IN_S_BITS = "Cannot store %s %s values in %s bits";
-    private static final String ENUM_CLASS_MUST_BE_DEFINED = "EnumClass must be defined.";
     private static final String NULL_ELEMENTS_NOT_PERMITTED = "null elements not permitted";
+    private static final String CANNOT_STORE_S_S_VALUES_IN_S_BITS = "Cannot store %s %s values in %s bits";
     private static final String S_DOES_NOT_SEEM_TO_BE_AN_ENUM_TYPE = "%s does not seem to be an Enum type";
+    private static final String ENUM_CLASS_MUST_BE_DEFINED = "EnumClass must be defined.";
 
     /**
      * Validate {@code enumClass}.
@@ -254,9 +252,16 @@ public class EnumUtils {
      * @return the enum, default enum if not found
      * @since 3.10
      */
-    public static <E extends Enum<E>> E getEnumIgnoreCase(final Class<E> enumClass, final String enumName,
-        final E defaultEnum) {
-        return getFirstEnumIgnoreCase(enumClass, enumName, Enum::name, defaultEnum);
+    public static <E extends Enum<E>> E getEnumIgnoreCase(final Class<E> enumClass, final String enumName, final E defaultEnum) {
+        if (enumName == null || !enumClass.isEnum()) {
+            return defaultEnum;
+        }
+        for (final E each : enumClass.getEnumConstants()) {
+            if (each.name().equalsIgnoreCase(enumName)) {
+                return each;
+            }
+        }
+        return defaultEnum;
     }
 
     /**
@@ -282,76 +287,11 @@ public class EnumUtils {
      * @return the modifiable map of enum names to enums, never null
      */
     public static <E extends Enum<E>> Map<String, E> getEnumMap(final Class<E> enumClass) {
-        return getEnumMap(enumClass, E::name);
-    }
-
-    /**
-     * <p>
-     * Gets the {@code Map} of enums by name.
-     * </p>
-     *
-     * <p>
-     * This method is useful when you need a map of enums by name.
-     * </p>
-     *
-     * @param <E>         the type of enumeration
-     * @param <K>         the type of the map key
-     * @param enumClass   the class of the enum to query, not null
-     * @param keyFunction the function to query for the key, not null
-     * @return the modifiable map of enums, never null
-     * @since 3.13.0
-     */
-    public static <E extends Enum<E>, K> Map<K, E> getEnumMap(final Class<E> enumClass, final Function<E, K> keyFunction) {
-        return Stream.of(enumClass.getEnumConstants()).collect(Collectors.toMap(keyFunction::apply, Function.identity()));
-    }
-
-    /**
-     * <p>
-     * Gets the enum for the class in a system property, returning {@code defaultEnum} if not found.
-     * </p>
-     *
-     * <p>
-     * This method differs from {@link Enum#valueOf} in that it does not throw an exception for an invalid enum name.
-     * </p>
-     *
-     * @param <E> the type of the enumeration
-     * @param enumClass the class of the enum to query, not null
-     * @param propName the system property key for the enum name, null returns default enum
-     * @param defaultEnum the default enum
-     * @return the enum, default enum if not found
-     * @since 3.13.0
-     */
-    public static <E extends Enum<E>> E getEnumSystemProperty(final Class<E> enumClass, final String propName,
-        final E defaultEnum) {
-        return enumClass == null || propName == null ? defaultEnum
-            : getEnum(enumClass, System.getProperty(propName), defaultEnum);
-    }
-
-    /**
-     * <p>Gets the enum for the class, returning {@code defaultEnum} if not found.</p>
-     *
-     * <p>This method differs from {@link Enum#valueOf} in that it does not throw an exception
-     * for an invalid enum name and performs case insensitive matching of the name.</p>
-     *
-     * @param <E>         the type of the enumeration
-     * @param enumClass   the class of the enum to query, not null
-     * @param enumName    the enum name, null returns default enum
-     * @param stringFunction the function that gets the string for an enum for comparison to {@code enumName}.
-     * @param defaultEnum the default enum
-     * @return the enum, default enum if not found
-     * @since 3.13.0
-     */
-    public static <E extends Enum<E>> E getFirstEnumIgnoreCase(final Class<E> enumClass, final String enumName,
-        final Function<E, String> stringFunction, final E defaultEnum) {
-        if (enumName == null || !enumClass.isEnum()) {
-            return defaultEnum;
+        final Map<String, E> map = new LinkedHashMap<>();
+        for (final E e: enumClass.getEnumConstants()) {
+            map.put(e.name(), e);
         }
-        for (final E each : enumClass.getEnumConstants()) {
-            if (enumName.equalsIgnoreCase(stringFunction.apply(each))) {
-                return each;
-            }
-        }
-        return defaultEnum;
+        return map;
     }
 
     /**

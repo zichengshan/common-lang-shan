@@ -32,15 +32,15 @@ final class IDKey {
 
         /**
          * Constructor for IDKey
-         * @param value The value
+         * @param _value The value
          */
-        IDKey(final Object value) {
+        IDKey(final Object _value) {
             // This is the Object hash code
-            this.id = System.identityHashCode(value);
+            id = System.identityHashCode(_value);
             // There have been some cases (LANG-459) that return the
             // same identity hash code for different objects.  So
             // the value is also added to disambiguate these cases.
-            this.value = value;
+            value = _value;
         }
 
         /**

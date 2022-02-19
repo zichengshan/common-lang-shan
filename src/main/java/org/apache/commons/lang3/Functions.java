@@ -523,14 +523,13 @@ public class Functions {
         Objects.requireNonNull(throwable, "throwable");
         if (throwable instanceof RuntimeException) {
             throw (RuntimeException) throwable;
-        }
-        if (throwable instanceof Error) {
+        } else if (throwable instanceof Error) {
             throw (Error) throwable;
-        }
-        if (throwable instanceof IOException) {
+        } else if (throwable instanceof IOException) {
             throw new UncheckedIOException((IOException) throwable);
+        } else {
+            throw new UndeclaredThrowableException(throwable);
         }
-        throw new UndeclaredThrowableException(throwable);
     }
 
     /**

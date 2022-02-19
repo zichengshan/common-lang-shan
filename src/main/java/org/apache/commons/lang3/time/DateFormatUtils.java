@@ -193,6 +193,7 @@ public class DateFormatUtils {
     public static final FastDateFormat SMTP_DATETIME_FORMAT
             = FastDateFormat.getInstance("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
 
+    //-----------------------------------------------------------------------
     /**
      * <p>DateFormatUtils instances should NOT be constructed in standard programming.</p>
      *

@@ -24,10 +24,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.apache.commons.lang3.builder.ToStringStyleTest.Person;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -305,7 +305,7 @@ public class JsonToStringStyleTest {
 
     @Test
     public void testObjectArray() {
-        final Object[] array = {null, base, new int[]{3, 6}};
+        final Object[] array = new Object[]{null, base, new int[]{3, 6}};
 
         final ToStringBuilder toStringBuilder = new ToStringBuilder(base);
         assertThrows(UnsupportedOperationException.class, () -> toStringBuilder.append(array).toString());
@@ -325,7 +325,7 @@ public class JsonToStringStyleTest {
 
     @Test
     public void testLongArray() {
-        final long[] array = {1, 2, -3, 4};
+        final long[] array = new long[]{1, 2, -3, 4};
 
         final ToStringBuilder toStringBuilder = new ToStringBuilder(base);
         assertThrows(UnsupportedOperationException.class, () -> toStringBuilder.append(array).toString());
@@ -345,7 +345,7 @@ public class JsonToStringStyleTest {
 
     @Test
     public void testIntArray() {
-        final int[] array = {1, 2, -3, 4};
+        final int[] array = new int[]{1, 2, -3, 4};
 
         final ToStringBuilder toStringBuilder = new ToStringBuilder(base);
         assertThrows(UnsupportedOperationException.class, () -> toStringBuilder.append(array).toString());
@@ -365,7 +365,7 @@ public class JsonToStringStyleTest {
 
     @Test
     public void testByteArray() {
-        final byte[] array = {1, 2, -3, 4};
+        final byte[] array = new byte[]{1, 2, -3, 4};
 
         final ToStringBuilder toStringBuilder = new ToStringBuilder(base);
         assertThrows(UnsupportedOperationException.class, () -> toStringBuilder.append(array).toString());
@@ -385,7 +385,7 @@ public class JsonToStringStyleTest {
 
     @Test
     public void testShortArray() {
-        final short[] array = {1, 2, -3, 4};
+        final short[] array = new short[]{1, 2, -3, 4};
 
         final ToStringBuilder toStringBuilder = new ToStringBuilder(base);
         assertThrows(UnsupportedOperationException.class, () -> toStringBuilder.append(array).toString());
@@ -405,7 +405,7 @@ public class JsonToStringStyleTest {
 
     @Test
     public void testDoubleArray() {
-        final double[] array = {1, 2, -3, 4};
+        final double[] array = new double[]{1, 2, -3, 4};
 
         final ToStringBuilder toStringBuilder = new ToStringBuilder(base);
         assertThrows(UnsupportedOperationException.class, () -> toStringBuilder.append(array).toString());
@@ -425,7 +425,7 @@ public class JsonToStringStyleTest {
 
     @Test
     public void testFloatArray() {
-        final float[] array = {1, 2, -3, 4};
+        final float[] array = new float[]{1, 2, -3, 4};
 
         final ToStringBuilder toStringBuilder = new ToStringBuilder(base);
         assertThrows(UnsupportedOperationException.class, () -> toStringBuilder.append(array).toString());
@@ -445,7 +445,7 @@ public class JsonToStringStyleTest {
 
     @Test
     public void testCharArray() {
-        final char[] array = {'1', '2', '3', '4'};
+        final char[] array = new char[]{'1', '2', '3', '4'};
 
         final ToStringBuilder toStringBuilder = new ToStringBuilder(base);
         assertThrows(UnsupportedOperationException.class, () -> toStringBuilder.append(array).toString());
@@ -465,7 +465,7 @@ public class JsonToStringStyleTest {
 
     @Test
     public void testBooleanArray() {
-        final boolean[] array = {true, false};
+        final boolean[] array = new boolean[]{true, false};
 
         final ToStringBuilder toStringBuilder = new ToStringBuilder(base);
         assertThrows(UnsupportedOperationException.class, () -> toStringBuilder.append(array).toString());
@@ -485,7 +485,7 @@ public class JsonToStringStyleTest {
 
     @Test
     public void testLongArrayArray() {
-        final long[][] array = {{1, 2}, null, {5}};
+        final long[][] array = new long[][]{{1, 2}, null, {5}};
 
         final ToStringBuilder toStringBuilder = new ToStringBuilder(base);
         assertThrows(UnsupportedOperationException.class, () -> toStringBuilder.append(array).toString());

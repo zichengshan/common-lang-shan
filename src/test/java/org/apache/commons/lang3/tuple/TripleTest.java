@@ -18,7 +18,6 @@ package org.apache.commons.lang3.tuple;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Calendar;
@@ -30,19 +29,6 @@ import org.junit.jupiter.api.Test;
  * Test the Triple class.
  */
 public class TripleTest {
-
-    @Test
-    public void testOfNonNull() {
-        assertThrows(NullPointerException.class, () -> Triple.ofNonNull(null, null, null));
-        assertThrows(NullPointerException.class, () -> Triple.ofNonNull(null, null, "z"));
-        assertThrows(NullPointerException.class, () -> Triple.ofNonNull(null, "y", "z"));
-        assertThrows(NullPointerException.class, () -> Triple.ofNonNull("x", null, null));
-        assertThrows(NullPointerException.class, () -> Triple.ofNonNull("x", "y", null));
-        final Triple<String, String, String> pair = Triple.ofNonNull("x", "y", "z");
-        assertEquals("x", pair.getLeft());
-        assertEquals("y", pair.getMiddle());
-        assertEquals("z", pair.getRight());
-    }
 
     @Test
     public void testComparable1() {
@@ -145,7 +131,7 @@ public class TripleTest {
         assertTrue(triple2 instanceof ImmutableTriple<?, ?, ?>);
         assertNull(((ImmutableTriple<Object, String, Long>) triple2).left);
         assertEquals("bar", ((ImmutableTriple<Object, String, Long>) triple2).middle);
-        assertEquals(Long.valueOf(200L), ((ImmutableTriple<Object, String, Long>) triple2).right);
+        assertEquals(new Long(200L), ((ImmutableTriple<Object, String, Long>) triple2).right);
     }
 
 }

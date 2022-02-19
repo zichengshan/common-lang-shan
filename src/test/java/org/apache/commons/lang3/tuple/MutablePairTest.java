@@ -19,7 +19,6 @@ package org.apache.commons.lang3.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -101,16 +100,6 @@ public class MutablePairTest {
         pair.setRight("bar");
         assertEquals(42, pair.getLeft().intValue());
         assertEquals("bar", pair.getRight());
-    }
-
-    @Test
-    public void testOfNonNull() {
-        assertThrows(NullPointerException.class, () -> MutablePair.ofNonNull(null, null));
-        assertThrows(NullPointerException.class, () -> MutablePair.ofNonNull(null, "x"));
-        assertThrows(NullPointerException.class, () -> MutablePair.ofNonNull("x", null));
-        final MutablePair<String, String> pair = MutablePair.ofNonNull("x", "y");
-        assertEquals("x", pair.left);
-        assertEquals("y", pair.right);
     }
 
     @Test

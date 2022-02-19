@@ -296,10 +296,9 @@ public class MethodUtilsTest {
             assertArrayEquals(a.getRight(), b.getRight());
         }
 
-        static void verify(final ImmutablePair<String, Object[]> a, final Object obj) {
-            @SuppressWarnings("unchecked")
-            final ImmutablePair<String, Object[]> pair = (ImmutablePair<String, Object[]>) obj;
-            verify(a, pair);
+        static void verify(final ImmutablePair<String, Object[]> a, final Object _b) {
+            @SuppressWarnings("unchecked") final ImmutablePair<String, Object[]> b = (ImmutablePair<String, Object[]>) _b;
+            verify(a, b);
         }
 
     }

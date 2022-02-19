@@ -18,6 +18,7 @@ package org.apache.commons.lang3.reflect;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
@@ -79,7 +80,8 @@ public class ConstructorUtils {
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException,
             InstantiationException {
         args = ArrayUtils.nullToEmpty(args);
-        return invokeConstructor(cls, args, ClassUtils.toClass(args));
+        final Class<?>[] parameterTypes = ClassUtils.toClass(args);
+        return invokeConstructor(cls, args, parameterTypes);
     }
 
     /**
@@ -142,7 +144,8 @@ public class ConstructorUtils {
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException,
             InstantiationException {
         args = ArrayUtils.nullToEmpty(args);
-        return invokeExactConstructor(cls, args, ClassUtils.toClass(args));
+        final Class<?>[] parameterTypes = ClassUtils.toClass(args);
+        return invokeExactConstructor(cls, args, parameterTypes);
     }
 
     /**
@@ -178,6 +181,7 @@ public class ConstructorUtils {
         return ctor.newInstance(args);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Finds a constructor given a class and signature, checking accessibility.</p>
      *
@@ -266,7 +270,8 @@ public class ConstructorUtils {
                     if (result == null || MemberUtils.compareConstructorFit(ctor, result, parameterTypes) < 0) {
                         // temporary variable for annotation, see comment above (1)
                         @SuppressWarnings("unchecked")
-                        final Constructor<T> constructor = (Constructor<T>) ctor;
+                        final
+                        Constructor<T> constructor = (Constructor<T>) ctor;
                         result = constructor;
                     }
                 }
@@ -276,7 +281,7 @@ public class ConstructorUtils {
     }
 
     /**
-     * Tests whether the specified class is generally accessible, i.e. is
+     * Learn whether the specified class is generally accessible, i.e. is
      * declared in an entirely {@code public} manner.
      * @param type to check
      * @return {@code true} if {@code type} and any enclosing classes are
@@ -285,7 +290,7 @@ public class ConstructorUtils {
     private static boolean isAccessible(final Class<?> type) {
         Class<?> cls = type;
         while (cls != null) {
-            if (!ClassUtils.isPublic(cls)) {
+            if (!Modifier.isPublic(cls.getModifiers())) {
                 return false;
             }
             cls = cls.getEnclosingClass();

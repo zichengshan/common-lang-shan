@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 @Deprecated
 public class WordUtilsTest {
 
+    //-----------------------------------------------------------------------
     @Test
     public void testConstructor() {
         assertNotNull(new WordUtils());
@@ -43,6 +44,7 @@ public class WordUtilsTest {
         assertFalse(Modifier.isFinal(WordUtils.class.getModifiers()));
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testWrap_StringInt() {
         assertNull(WordUtils.wrap(null, 20));
@@ -180,6 +182,7 @@ public class WordUtilsTest {
         assertEquals(expected, WordUtils.wrap(input, 15, "\n", true, "/"));
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testCapitalize_String() {
         assertNull(WordUtils.capitalize(null));
@@ -200,7 +203,7 @@ public class WordUtilsTest {
         assertEquals("", WordUtils.capitalize(""));
         assertEquals("  ", WordUtils.capitalize("  "));
 
-        char[] chars = { '-', '+', ' ', '@' };
+        char[] chars = new char[] { '-', '+', ' ', '@' };
         assertEquals("I", WordUtils.capitalize("I", chars) );
         assertEquals("I", WordUtils.capitalize("i", chars) );
         assertEquals("I-Am Here+123", WordUtils.capitalize("i-am here+123", chars) );
@@ -232,7 +235,7 @@ public class WordUtilsTest {
         assertEquals("", WordUtils.capitalizeFully(""));
         assertEquals("  ", WordUtils.capitalizeFully("  "));
 
-        char[] chars = { '-', '+', ' ', '@' };
+        char[] chars = new char[] { '-', '+', ' ', '@' };
         assertEquals("I", WordUtils.capitalizeFully("I", chars) );
         assertEquals("I", WordUtils.capitalizeFully("i", chars) );
         assertEquals("I-Am Here+123", WordUtils.capitalizeFully("i-am here+123", chars) );
@@ -284,7 +287,7 @@ public class WordUtilsTest {
         assertEquals("", WordUtils.uncapitalize(""));
         assertEquals("  ", WordUtils.uncapitalize("  "));
 
-        char[] chars = { '-', '+', ' ', '@' };
+        char[] chars = new char[] { '-', '+', ' ', '@' };
         assertEquals("i", WordUtils.uncapitalize("I", chars) );
         assertEquals("i", WordUtils.uncapitalize("i", chars) );
         assertEquals("i am-here+123", WordUtils.uncapitalize("i am-here+123", chars) );
@@ -296,6 +299,7 @@ public class WordUtilsTest {
         assertEquals("i aM.FINE", WordUtils.uncapitalize("I AM.FINE", null) );
     }
 
+    //-----------------------------------------------------------------------
     @Test
     public void testInitials_String() {
         assertNull(WordUtils.initials(null));

@@ -33,7 +33,7 @@ import org.apache.commons.lang3.Validate;
  * and padding, and is not designed to allow generalised alternate formats.</p>
  *
  * @since 3.0
- * @deprecated As of 3.6, use Apache Commons Text
+ * @deprecated as of 3.6, use commons-text
  * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/FormattableUtils.html">
  * FormattableUtils</a> instead
  */
@@ -56,6 +56,7 @@ public class FormattableUtils {
     public FormattableUtils() {
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Gets the default formatted representation of the specified
      * {@code Formattable}.
@@ -138,8 +139,8 @@ public class FormattableUtils {
                 "Specified ellipsis '%1$s' exceeds precision of %2$s", ellipsis, Integer.valueOf(precision));
         final StringBuilder buf = new StringBuilder(seq);
         if (precision >= 0 && precision < seq.length()) {
-            final CharSequence actualEllipsis = ObjectUtils.defaultIfNull(ellipsis, StringUtils.EMPTY);
-            buf.replace(precision - actualEllipsis.length(), seq.length(), actualEllipsis.toString());
+            final CharSequence _ellipsis = ObjectUtils.defaultIfNull(ellipsis, StringUtils.EMPTY);
+            buf.replace(precision - _ellipsis.length(), seq.length(), _ellipsis.toString());
         }
         final boolean leftJustify = (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY;
         for (int i = buf.length(); i < width; i++) {

@@ -36,7 +36,7 @@ import org.apache.commons.lang3.text.translate.UnicodeUnpairedSurrogateRemover;
  *
  * <p>#ThreadSafe#</p>
  * @since 2.0
- * @deprecated As of 3.6, use Apache Commons Text
+ * @deprecated as of 3.6, use commons-text
  * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/StringEscapeUtils.html">
  * StringEscapeUtils</a> instead
  */
@@ -605,6 +605,7 @@ public class StringEscapeUtils {
         return ESCAPE_HTML3.translate(input);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Unescapes a string containing entity escapes to a string
      * containing the actual Unicode characters corresponding to the
@@ -640,6 +641,7 @@ public class StringEscapeUtils {
         return UNESCAPE_HTML3.translate(input);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Escapes the characters in a {@code String} using XML entities.</p>
      *
@@ -727,6 +729,7 @@ public class StringEscapeUtils {
         return ESCAPE_XML11.translate(input);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Unescapes a string containing XML entity escapes to a string
      * containing the actual Unicode characters corresponding to the
@@ -748,6 +751,7 @@ public class StringEscapeUtils {
         return UNESCAPE_XML.translate(input);
     }
 
+    //-----------------------------------------------------------------------
 
     /**
      * <p>Returns a {@code String} value for a CSV column enclosed in double quotes,

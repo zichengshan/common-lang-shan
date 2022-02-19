@@ -564,9 +564,11 @@ public class TypeUtils {
             parameterizedType.getActualTypeArguments().length);
         int[] indexesToRemove = {};
         for (int i = 0; i < filteredArgumentTypes.length; i++) {
-            if ((filteredArgumentTypes[i] instanceof TypeVariable<?>) && containsVariableTypeSameParametrizedTypeBound(
-                ((TypeVariable<?>) filteredArgumentTypes[i]), parameterizedType)) {
-                indexesToRemove = ArrayUtils.add(indexesToRemove, i);
+            if (filteredArgumentTypes[i] instanceof TypeVariable<?>) {
+                if (containsVariableTypeSameParametrizedTypeBound(((TypeVariable<?>) filteredArgumentTypes[i]),
+                    parameterizedType)) {
+                    indexesToRemove = ArrayUtils.add(indexesToRemove, i);
+                }
             }
         }
         return indexesToRemove;
@@ -630,7 +632,7 @@ public class TypeUtils {
 
             // find the interface closest to the super class
             for (final Type midType : interfaceTypes) {
-                final Class<?> midClass;
+                Class<?> midClass = null;
 
                 if (midType instanceof ParameterizedType) {
                     midClass = getRawType((ParameterizedType) midType);
@@ -1799,22 +1801,24 @@ public class TypeUtils {
     }
 
     /**
-     * Looks up {@code typeVariable} in {@code typeVarAssigns} <em>transitively</em>, i.e. keep looking until the value
-     * found is <em>not</em> a type variable.
+     * Look up {@code var} in {@code typeVarAssigns} <em>transitively</em>,
+     * i.e. keep looking until the value found is <em>not</em> a type variable.
      *
      * @param typeVariable the type variable to look up
      * @param typeVarAssigns the map used for the look up
      * @return Type or {@code null} if some variable was not in the map
      * @since 3.2
      */
-    private static Type unrollVariableAssignments(TypeVariable<?> typeVariable, final Map<TypeVariable<?>, Type> typeVarAssigns) {
+    private static Type unrollVariableAssignments(TypeVariable<?> typeVariable,
+        final Map<TypeVariable<?>, Type> typeVarAssigns) {
         Type result;
         do {
             result = typeVarAssigns.get(typeVariable);
-            if (!(result instanceof TypeVariable<?>) || result.equals(typeVariable)) {
-                break;
+            if (result instanceof TypeVariable<?> && !result.equals(typeVariable)) {
+                typeVariable = (TypeVariable<?>) result;
+                continue;
             }
-            typeVariable = (TypeVariable<?>) result;
+            break;
         } while (true);
         return result;
     }

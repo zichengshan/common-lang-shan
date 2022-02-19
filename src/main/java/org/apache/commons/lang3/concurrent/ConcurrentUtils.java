@@ -164,6 +164,7 @@ public class ConcurrentUtils {
         }
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Invokes the specified {@code ConcurrentInitializer} and returns the
      * object produced by the initializer. This method just invokes the {@code
@@ -203,6 +204,7 @@ public class ConcurrentUtils {
         }
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>
      * Puts a value in the specified {@code ConcurrentMap} if the key is not yet
@@ -303,6 +305,7 @@ public class ConcurrentUtils {
         }
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>
      * Gets an implementation of {@code Future} that is immediately done

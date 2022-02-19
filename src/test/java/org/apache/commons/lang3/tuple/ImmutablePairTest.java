@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -153,16 +152,6 @@ public class ImmutablePairTest {
     @Test
     public void testNullPairValue() {
         assertNull(ImmutablePair.nullPair().getValue());
-    }
-
-    @Test
-    public void testOfNonNull() {
-        assertThrows(NullPointerException.class, () -> ImmutablePair.ofNonNull(null, null));
-        assertThrows(NullPointerException.class, () -> ImmutablePair.ofNonNull(null, "x"));
-        assertThrows(NullPointerException.class, () -> ImmutablePair.ofNonNull("x", null));
-        final ImmutablePair<String, String> pair = ImmutablePair.ofNonNull("x", "y");
-        assertEquals("x", pair.left);
-        assertEquals("y", pair.right);
     }
 
     @Test

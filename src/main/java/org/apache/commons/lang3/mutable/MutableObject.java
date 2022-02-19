@@ -52,6 +52,7 @@ public class MutableObject<T> implements Mutable<T>, Serializable {
         this.value = value;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Gets the value.
      *
@@ -72,6 +73,7 @@ public class MutableObject<T> implements Mutable<T>, Serializable {
         this.value = value;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>
      * Compares this object against the specified object. The result is {@code true} if and only if the argument
@@ -109,6 +111,7 @@ public class MutableObject<T> implements Mutable<T>, Serializable {
         return value == null ? 0 : value.hashCode();
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Returns the String value of this mutable.
      *

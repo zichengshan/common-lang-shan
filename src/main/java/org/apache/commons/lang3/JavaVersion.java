@@ -169,6 +169,7 @@ public enum JavaVersion {
         this.name = name;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Whether this version of Java is at least the version of Java passed in.</p>
      *
@@ -182,6 +183,7 @@ public enum JavaVersion {
         return this.value >= requiredVersion.value;
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Whether this version of Java is at most the version of Java passed in.</p>
      *
@@ -275,6 +277,7 @@ public enum JavaVersion {
         }
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>The string value is overridden to return the standard name.</p>
      *
@@ -308,12 +311,13 @@ public enum JavaVersion {
      */
     private static float toFloatVersion(final String value) {
         final int defaultReturnValue = -1;
-        if (!value.contains(".")) {
+        if (value.contains(".")) {
+            final String[] toParse = value.split("\\.");
+            if (toParse.length >= 2) {
+                return NumberUtils.toFloat(toParse[0] + '.' + toParse[1], defaultReturnValue);
+            }
+        } else {
             return NumberUtils.toFloat(value, defaultReturnValue);
-        }
-        final String[] toParse = value.split("\\.");
-        if (toParse.length >= 2) {
-            return NumberUtils.toFloat(toParse[0] + '.' + toParse[1], defaultReturnValue);
         }
         return defaultReturnValue;
     }

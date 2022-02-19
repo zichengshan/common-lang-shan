@@ -95,6 +95,7 @@ public class NumberUtils {
     public NumberUtils() {
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Convert a {@code String} to an {@code int}, returning
      * {@code zero} if the conversion fails.</p>
@@ -338,6 +339,7 @@ public class NumberUtils {
         return value == null ? defaultValue : value.doubleValue();
     }
 
+     //-----------------------------------------------------------------------
      /**
      * <p>Convert a {@code String} to a {@code byte}, returning
      * {@code zero} if the conversion fails.</p>
@@ -591,6 +593,7 @@ public class NumberUtils {
         );
     }
 
+    //-----------------------------------------------------------------------
     // must handle Long, Float, Integer, Float, Short,
     //                  BigDecimal, BigInteger and Byte
     // useful methods:
@@ -641,8 +644,8 @@ public class NumberUtils {
      * <p>If a type specifier is not found, it will check for a decimal point
      * and then try successively larger types from {@code Integer} to
      * {@code BigInteger} and from {@code Float} to
-     * {@code BigDecimal}.</p>
-     *
+    * {@code BigDecimal}.</p>
+    *
      * <p>
      * Integral values with a leading {@code 0} will be interpreted as octal; the returned number will
      * be Integer, Long or BigDecimal as appropriate.
@@ -665,13 +668,12 @@ public class NumberUtils {
             throw new NumberFormatException("A blank string is not a valid number");
         }
         // Need to deal with all possible hex prefixes here
-        final String[] hex_prefixes = {"0x", "0X", "#"};
+        final String[] hex_prefixes = {"0x", "0X", "-0x", "-0X", "#", "-#"};
         final int length = str.length();
-        final int offset = str.charAt(0) == '+' || str.charAt(0) == '-' ? 1 : 0;
         int pfxLen = 0;
         for (final String pfx : hex_prefixes) {
-            if (str.startsWith(pfx, offset)) {
-                pfxLen += pfx.length() + offset;
+            if (str.startsWith(pfx)) {
+                pfxLen += pfx.length();
                 break;
             }
         }
@@ -679,10 +681,11 @@ public class NumberUtils {
             char firstSigDigit = 0; // strip leading zeroes
             for (int i = pfxLen; i < length; i++) {
                 firstSigDigit = str.charAt(i);
-                if (firstSigDigit != '0') {
+                if (firstSigDigit == '0') { // count leading zeroes
+                    pfxLen++;
+                } else {
                     break;
                 }
-                pfxLen++;
             }
             final int hexDigits = length - pfxLen;
             if (hexDigits > 16 || hexDigits == 16 && firstSigDigit > '7') { // too many for Long
@@ -702,8 +705,6 @@ public class NumberUtils {
         // if both e and E are present, this is caught by the checks on expPos (which prevent IOOBE)
         // and the parsing which will detect if e or E appear in a number due to using the wrong offset
 
-        // Detect if the return type has been requested
-        final boolean requestType = !Character.isDigit(lastChar) && lastChar != '.';
         if (decPos > -1) { // there is a decimal point
             if (expPos > -1) { // there is an exponent
                 if (expPos < decPos || expPos > length) { // prevents double exponent causing IOOBE
@@ -711,8 +712,7 @@ public class NumberUtils {
                 }
                 dec = str.substring(decPos + 1, expPos);
             } else {
-                // No exponent, but there may be a type character to remove
-                dec = str.substring(decPos + 1, requestType ? length - 1 : length);
+                dec = str.substring(decPos + 1);
             }
             mant = getMantissa(str, decPos);
         } else {
@@ -722,12 +722,11 @@ public class NumberUtils {
                 }
                 mant = getMantissa(str, expPos);
             } else {
-                // No decimal, no exponent, but there may be a type character to remove
-                mant = getMantissa(str, requestType ? length - 1 : length);
+                mant = getMantissa(str);
             }
             dec = null;
         }
-        if (requestType) {
+        if (!Character.isDigit(lastChar) && lastChar != '.') {
             if (expPos > -1 && expPos < length - 1) {
                 exp = str.substring(expPos + 1, length - 1);
             } else {
@@ -735,6 +734,7 @@ public class NumberUtils {
             }
             //Requesting a specific type..
             final String numeric = str.substring(0, length - 1);
+            final boolean allZeros = isAllZeros(mant) && isAllZeros(exp);
             switch (lastChar) {
                 case 'l' :
                 case 'L' :
@@ -754,7 +754,7 @@ public class NumberUtils {
                 case 'F' :
                     try {
                         final Float f = createFloat(str);
-                        if (!(f.isInfinite() || f.floatValue() == 0.0F && !isZero(mant, dec))) {
+                        if (!(f.isInfinite() || f.floatValue() == 0.0F && !allZeros)) {
                             //If it's too big for a float or the float value = 0 and the string
                             //has non-zeros in it, then float does not have the precision we want
                             return f;
@@ -768,7 +768,7 @@ public class NumberUtils {
                 case 'D' :
                     try {
                         final Double d = createDouble(str);
-                        if (!(d.isInfinite() || d.doubleValue() == 0.0D && !isZero(mant, dec))) {
+                        if (!(d.isInfinite() || d.doubleValue() == 0.0D && !allZeros)) {
                             return d;
                         }
                     } catch (final NumberFormatException nfe) { // NOPMD
@@ -808,15 +808,16 @@ public class NumberUtils {
         }
 
         //Must be a Float, Double, BigDecimal
+        final boolean allZeros = isAllZeros(mant) && isAllZeros(exp);
         try {
             final Float f = createFloat(str);
             final Double d = createDouble(str);
             if (!f.isInfinite()
-                    && !(f.floatValue() == 0.0F && !isZero(mant, dec))
+                    && !(f.floatValue() == 0.0F && !allZeros)
                     && f.toString().equals(d.toString())) {
                 return f;
             }
-            if (!d.isInfinite() && !(d.doubleValue() == 0.0D && !isZero(mant, dec))) {
+            if (!d.isInfinite() && !(d.doubleValue() == 0.0D && !allZeros)) {
                 final BigDecimal b = createBigDecimal(str);
                 if (b.compareTo(BigDecimal.valueOf(d.doubleValue())) == 0) {
                     return d;
@@ -827,6 +828,18 @@ public class NumberUtils {
             // ignore the bad number
         }
         return createBigDecimal(str);
+    }
+
+    /**
+     * <p>Utility method for {@link #createNumber(java.lang.String)}.</p>
+     *
+     * <p>Returns mantissa of the given number.</p>
+     *
+     * @param str the string representation of the number
+     * @return mantissa of the given number
+     */
+    private static String getMantissa(final String str) {
+        return getMantissa(str, str.length());
     }
 
     /**
@@ -846,41 +859,11 @@ public class NumberUtils {
     }
 
     /**
-     * Utility method for {@link #createNumber(java.lang.String)}.
+     * <p>Utility method for {@link #createNumber(java.lang.String)}.</p>
      *
-     * <p>This will check if the magnitude of the number is zero by checking if there
-     * are only zeros before and after the decimal place.</p>
+     * <p>Returns {@code true} if s is {@code null}.</p>
      *
-     * <p>Note: It is <strong>assumed</strong> that the input string has been converted
-     * to either a Float or Double with a value of zero when this method is called.
-     * This eliminates invalid input for example {@code ".", ".D", ".e0"}.</p>
-     *
-     * <p>Thus the method only requires checking if both arguments are null, empty or
-     * contain only zeros.</p>
-     *
-     * <p>Given {@code s = mant + "." + dec}:</p>
-     * <ul>
-     * <li>{@code true} if s is {@code "0.0"}
-     * <li>{@code true} if s is {@code "0."}
-     * <li>{@code true} if s is {@code ".0"}
-     * <li>{@code false} otherwise (this assumes {@code "."} is not possible)
-     * </ul>
-     *
-     * @param mant the mantissa decimal digits before the decimal point (sign must be removed; never null)
-     * @param dec the decimal digits after the decimal point (exponent and type specifier removed;
-     *            can be null)
-     * @return true if the magnitude is zero
-     */
-    private static boolean isZero(final String mant, final String dec) {
-        return isAllZeros(mant) && isAllZeros(dec);
-    }
-
-    /**
-     * Utility method for {@link #createNumber(java.lang.String)}.
-     *
-     * <p>Returns {@code true} if s is {@code null} or empty.</p>
-     *
-     * @param str the String to check
+     * @param str  the String to check
      * @return if it is all zeros or {@code null}
      */
     private static boolean isAllZeros(final String str) {
@@ -892,9 +875,10 @@ public class NumberUtils {
                 return false;
             }
         }
-        return true;
+        return !str.isEmpty();
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Convert a {@code String} to a {@code Float}.</p>
      *
@@ -978,17 +962,11 @@ public class NumberUtils {
         if (str == null) {
             return null;
         }
-        if (str.isEmpty()) {
-            throw new NumberFormatException("An empty string is not a valid number");
-        }
         int pos = 0; // offset within string
         int radix = 10;
         boolean negate = false; // need to negate later?
-        final char char0 = str.charAt(0);
-        if (char0 == '-') {
+        if (str.startsWith("-")) {
             negate = true;
-            pos = 1;
-        } else if (char0 == '+') {
             pos = 1;
         }
         if (str.startsWith("0x", pos) || str.startsWith("0X", pos)) { // hex
@@ -1033,7 +1011,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the minimum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @since 3.4 Changed signature from min(long[]) to min(long...)
      */
@@ -1057,7 +1035,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the minimum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @since 3.4 Changed signature from min(int[]) to min(int...)
      */
@@ -1081,7 +1059,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the minimum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @since 3.4 Changed signature from min(short[]) to min(short...)
      */
@@ -1105,7 +1083,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the minimum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @since 3.4 Changed signature from min(byte[]) to min(byte...)
      */
@@ -1129,7 +1107,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the minimum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @see IEEE754rUtils#min(double[]) IEEE754rUtils for a version of this method that handles NaN differently
      * @since 3.4 Changed signature from min(double[]) to min(double...)
@@ -1157,7 +1135,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the minimum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @see IEEE754rUtils#min(float[]) IEEE754rUtils for a version of this method that handles NaN differently
      * @since 3.4 Changed signature from min(float[]) to min(float...)
@@ -1187,7 +1165,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the maximum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @since 3.4 Changed signature from max(long[]) to max(long...)
      */
@@ -1211,7 +1189,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the maximum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @since 3.4 Changed signature from max(int[]) to max(int...)
      */
@@ -1235,7 +1213,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the maximum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @since 3.4 Changed signature from max(short[]) to max(short...)
      */
@@ -1259,7 +1237,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the maximum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @since 3.4 Changed signature from max(byte[]) to max(byte...)
      */
@@ -1283,7 +1261,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the maximum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @see IEEE754rUtils#max(double[]) IEEE754rUtils for a version of this method that handles NaN differently
      * @since 3.4 Changed signature from max(double[]) to max(double...)
@@ -1311,7 +1289,7 @@ public class NumberUtils {
      *
      * @param array  an array, must not be null or empty
      * @return the maximum value in the array
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty
      * @see IEEE754rUtils#max(float[]) IEEE754rUtils for a version of this method that handles NaN differently
      * @since 3.4 Changed signature from max(float[]) to max(float...)
@@ -1338,8 +1316,7 @@ public class NumberUtils {
      * Checks if the specified array is neither null nor empty.
      *
      * @param array  the array to check
-     * @throws IllegalArgumentException if {@code array} is empty
-     * @throws NullPointerException if {@code array} is {@code null}
+     * @throws IllegalArgumentException if {@code array} is either {@code null} or empty
      */
     private static void validateArray(final Object array) {
         Validate.notNull(array, "array");
@@ -1347,6 +1324,7 @@ public class NumberUtils {
     }
 
     // 3 param min
+    //-----------------------------------------------------------------------
     /**
      * <p>Gets the minimum of three {@code long} values.</p>
      *
@@ -1452,6 +1430,7 @@ public class NumberUtils {
     }
 
     // 3 param max
+    //-----------------------------------------------------------------------
     /**
      * <p>Gets the maximum of three {@code long} values.</p>
      *
@@ -1556,6 +1535,7 @@ public class NumberUtils {
         return Math.max(Math.max(a, b), c);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Checks whether the {@code String} contains only
      * digit characters.</p>
@@ -1649,17 +1629,16 @@ public class NumberUtils {
                     }
                 }
                 return true;
-           }
-            if (Character.isDigit(chars[start + 1])) {
-                   // leading 0, but not hex, must be octal
-                   int i = start + 1;
-                   for (; i < chars.length; i++) {
-                       if (chars[i] < '0' || chars[i] > '7') {
-                           return false;
-                       }
+           } else if (Character.isDigit(chars[start + 1])) {
+               // leading 0, but not hex, must be octal
+               int i = start + 1;
+               for (; i < chars.length; i++) {
+                   if (chars[i] < '0' || chars[i] > '7') {
+                       return false;
                    }
-                   return true;
                }
+               return true;
+           }
         }
         sz--; // don't want to loop to the last char, check it afterwords
               // for type qualifiers

@@ -62,6 +62,7 @@ public class SerializationUtilsTest {
         iMap.put("BAR", iInteger);
     }
 
+    //-----------------------------------------------------------------------
 
     @Test
     public void testConstructor() {
@@ -95,6 +96,7 @@ public class SerializationUtilsTest {
         assertSame(ex, serEx.getCause());
     }
 
+    //-----------------------------------------------------------------------
 
     @Test
     public void testSerializeStream() throws Exception {
@@ -162,6 +164,7 @@ public class SerializationUtilsTest {
         assertEquals("java.io.IOException: " + SERIALIZE_IO_EXCEPTION_MESSAGE, e.getMessage());
     }
 
+    //-----------------------------------------------------------------------
 
     @Test
     public void testDeserializeStream() throws Exception {
@@ -240,6 +243,7 @@ public class SerializationUtilsTest {
         assertEquals(iMap, newMap);
     }
 
+    //-----------------------------------------------------------------------
 
     @Test
     public void testSerializeBytes() throws Exception {
@@ -277,6 +281,7 @@ public class SerializationUtilsTest {
         assertArrayEquals(realBytes, testBytes);
     }
 
+    //-----------------------------------------------------------------------
 
     @Test
     public void testDeserializeBytes() throws Exception {
@@ -320,6 +325,7 @@ public class SerializationUtilsTest {
         assertThrows(SerializationException.class, () -> SerializationUtils.deserialize(new byte[0]));
     }
 
+    //-----------------------------------------------------------------------
 
     @Test
     public void testClone() {

@@ -29,7 +29,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.concurrent.UncheckedFuture;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -102,7 +101,9 @@ public class ToStringStyleConcurrencyTest {
             tasks.add(consumer);
             tasks.add(consumer);
             final List<Future<Integer>> futures = threadPool.invokeAll(tasks);
-            UncheckedFuture.on(futures).forEach(UncheckedFuture::get);
+            for (final Future<Integer> future : futures) {
+                future.get();
+            }
         } finally {
             threadPool.shutdown();
             threadPool.awaitTermination(1, TimeUnit.SECONDS);

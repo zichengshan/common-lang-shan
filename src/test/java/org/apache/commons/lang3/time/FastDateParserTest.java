@@ -19,7 +19,6 @@ package org.apache.commons.lang3.time;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -54,7 +53,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class FastDateParserTest {
 
     private enum Expected1806 {
-        India(INDIA, "+05", "+0530", "+05:30", true), Greenwich(TimeZones.GMT, "Z", "Z", "Z", false),
+        India(INDIA, "+05", "+0530", "+05:30", true), Greenwich(GMT, "Z", "Z", "Z", false),
         NewYork(NEW_YORK, "-05", "-0500", "-05:00", false);
 
         final TimeZone zone;
@@ -90,31 +89,10 @@ public class FastDateParserTest {
 
     private static final TimeZone REYKJAVIK = TimeZone.getTimeZone("Atlantic/Reykjavik");
     private static final TimeZone NEW_YORK = TimeZone.getTimeZone("America/New_York");
+    static final TimeZone GMT = TimeZone.getTimeZone("GMT");
     private static final TimeZone INDIA = TimeZone.getTimeZone("Asia/Calcutta");
 
     private static final Locale SWEDEN = new Locale("sv", "SE");
-
-    static void checkParse(final Locale locale, final Calendar cal, final SimpleDateFormat simpleDateFormat,
-            final DateParser dateParser) {
-        final String formattedDate = simpleDateFormat.format(cal.getTime());
-        checkParse(locale, simpleDateFormat, dateParser, formattedDate, formattedDate);
-        checkParse(locale, simpleDateFormat, dateParser, formattedDate.toLowerCase(locale), formattedDate);
-        checkParse(locale, simpleDateFormat, dateParser, formattedDate.toUpperCase(locale), formattedDate);
-    }
-
-    static void checkParse(final Locale locale, final SimpleDateFormat simpleDateFormat, final DateParser dateParser,
-        final String formattedDate, final String originalFormattedDate) {
-        try {
-            final Date expectedTime = simpleDateFormat.parse(formattedDate);
-            final Date actualTime = dateParser.parse(formattedDate);
-            assertEquals(expectedTime, actualTime,
-                "locale: " + locale + ", formattedDate: '" + formattedDate + "', originalFormattedDate: '"
-                    + originalFormattedDate + ", simpleDateFormat.pattern: '" + simpleDateFormat + "', Java: "
-                    + SystemUtils.JAVA_RUNTIME_VERSION + "\n");
-        } catch (final Exception e) {
-            fail("locale: " + locale + ", formattedDate: '" + formattedDate + "', error : " + e + "\n", e);
-        }
-    }
 
     static Stream<Arguments> dateParserParameters() {
         return Stream.of(
@@ -140,6 +118,28 @@ public class FastDateParserTest {
 
     private final TriFunction<String, TimeZone, Locale, DateParser> dateParserProvider = (format, timeZone,
             locale) -> new FastDateParser(format, timeZone, locale, null);
+
+    static void checkParse(final Locale locale, final Calendar cal, final SimpleDateFormat simpleDateFormat,
+            final DateParser dateParser) {
+        final String formattedDate = simpleDateFormat.format(cal.getTime());
+        checkParse(locale, simpleDateFormat, dateParser, formattedDate, formattedDate);
+        checkParse(locale, simpleDateFormat, dateParser, formattedDate.toLowerCase(locale), formattedDate);
+        checkParse(locale, simpleDateFormat, dateParser, formattedDate.toUpperCase(locale), formattedDate);
+    }
+
+    static void checkParse(final Locale locale, final SimpleDateFormat simpleDateFormat, final DateParser dateParser,
+        final String formattedDate, final String originalFormattedDate) {
+        try {
+            final Date expectedTime = simpleDateFormat.parse(formattedDate);
+            final Date actualTime = dateParser.parse(formattedDate);
+            assertEquals(expectedTime, actualTime,
+                "locale: " + locale + ", formattedDate: '" + formattedDate + "', originalFormattedDate: '"
+                    + originalFormattedDate + ", simpleDateFormat.pattern: '" + simpleDateFormat + "', Java: "
+                    + SystemUtils.JAVA_RUNTIME_VERSION + "\n");
+        } catch (final Exception e) {
+            fail("locale: " + locale + ", formattedDate: '" + formattedDate + "', error : " + e + "\n", e);
+        }
+    }
 
     private DateParser getDateInstance(final int dateStyle, final Locale locale) {
         return getInstance(null, FormatCache.getPatternForStyle(Integer.valueOf(dateStyle), null, locale),
@@ -316,10 +316,13 @@ public class FastDateParserTest {
         assertNotEquals(parser1, new Object());
     }
 
+    /**
+     * @throws ParseException
+     */
     @Test
     public void testJpLocales() throws ParseException {
 
-        final Calendar cal = Calendar.getInstance(TimeZones.GMT);
+        final Calendar cal = Calendar.getInstance(GMT);
         cal.clear();
         cal.set(2003, Calendar.FEBRUARY, 10);
         cal.set(Calendar.ERA, GregorianCalendar.BC);
@@ -375,11 +378,11 @@ public class FastDateParserTest {
     @ParameterizedTest
     @MethodSource(DATE_PARSER_PARAMETERS)
     public void testLang1380(final TriFunction<String, TimeZone, Locale, DateParser> dpProvider) throws ParseException {
-        final Calendar expected = Calendar.getInstance(TimeZones.GMT, Locale.FRANCE);
+        final Calendar expected = Calendar.getInstance(GMT, Locale.FRANCE);
         expected.clear();
         expected.set(2014, Calendar.APRIL, 14);
 
-        final DateParser fdp = getInstance(dpProvider, "dd MMM yyyy", TimeZones.GMT, Locale.FRANCE);
+        final DateParser fdp = getInstance(dpProvider, "dd MMM yyyy", GMT, Locale.FRANCE);
         assertEquals(expected.getTime(), fdp.parse("14 avril 2014"));
         assertEquals(expected.getTime(), fdp.parse("14 avr. 2014"));
         assertEquals(expected.getTime(), fdp.parse("14 avr 2014"));
@@ -399,7 +402,7 @@ public class FastDateParserTest {
 
     @Test
     public void testLang538() throws ParseException {
-        final DateParser parser = getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", TimeZones.GMT);
+        final DateParser parser = getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", GMT);
 
         final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT-8"));
         cal.clear();
@@ -513,45 +516,21 @@ public class FastDateParserTest {
     public void testParses() throws Exception {
         for (final String format : new String[] {LONG_FORMAT, SHORT_FORMAT}) {
             for (final Locale locale : Locale.getAvailableLocales()) {
-                for (final TimeZone timeZone : new TimeZone[] {NEW_YORK, REYKJAVIK, TimeZones.GMT}) {
+                for (final TimeZone tz : new TimeZone[] {NEW_YORK, REYKJAVIK, GMT}) {
                     for (final int year : new int[] {2003, 1940, 1868, 1867, 1, -1, -1940}) {
-                        final Calendar cal = getEraStart(year, timeZone, locale);
+                        final Calendar cal = getEraStart(year, tz, locale);
                         final Date centuryStart = cal.getTime();
 
                         cal.set(Calendar.MONTH, 1);
                         cal.set(Calendar.DAY_OF_MONTH, 10);
                         final Date in = cal.getTime();
 
-                        final FastDateParser fastDateParser = new FastDateParser(format, timeZone, locale,
-                            centuryStart);
-                        validateSdfFormatFdpParseEquality(format, locale, timeZone, fastDateParser, in, year,
-                            centuryStart);
+                        final FastDateParser fastDateParser = new FastDateParser(format, tz, locale, centuryStart);
+                        validateSdfFormatFdpParseEquality(format, locale, tz, fastDateParser, in, year, centuryStart);
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Fails on Java 16 Early Access build 25 and above, last tested with build 36.
-     */
-    @Test
-    public void testParsesKnownJava16Ea25Failure() throws Exception {
-        final String format = LONG_FORMAT;
-        final int year = 2003;
-        final Locale locale = new Locale.Builder().setLanguage("sq").setRegion("MK").build();
-        assertEquals("sq_MK", locale.toString());
-        assertNotNull(locale);
-        final TimeZone timeZone = NEW_YORK;
-        final Calendar cal = getEraStart(year, timeZone, locale);
-        final Date centuryStart = cal.getTime();
-
-        cal.set(Calendar.MONTH, 1);
-        cal.set(Calendar.DAY_OF_MONTH, 10);
-        final Date in = cal.getTime();
-
-        final FastDateParser fastDateParser = new FastDateParser(format, timeZone, locale, centuryStart);
-        validateSdfFormatFdpParseEquality(format, locale, timeZone, fastDateParser, in, year, centuryStart);
     }
 
     @ParameterizedTest
@@ -690,34 +669,32 @@ public class FastDateParserTest {
         for (final Locale locale : Locale.getAvailableLocales()) {
             final FastDateParser fdp = new FastDateParser("yyyy/MM/dd z", TimeZone.getDefault(), locale);
 
-            for (final TimeZone timeZone : new TimeZone[] {NEW_YORK, REYKJAVIK, TimeZones.GMT}) {
-                final Calendar cal = Calendar.getInstance(timeZone, locale);
+            for (final TimeZone tz : new TimeZone[] {NEW_YORK, REYKJAVIK, GMT}) {
+                final Calendar cal = Calendar.getInstance(tz, locale);
                 cal.clear();
                 cal.set(Calendar.YEAR, 2000);
                 cal.set(Calendar.MONTH, 1);
                 cal.set(Calendar.DAY_OF_MONTH, 10);
                 final Date expected = cal.getTime();
 
-                final Date actual = fdp.parse("2000/02/10 " + timeZone.getDisplayName(locale));
-                assertEquals(expected, actual, "timeZone:" + timeZone.getID() + " locale:" + locale.getDisplayName());
+                final Date actual = fdp.parse("2000/02/10 " + tz.getDisplayName(locale));
+                assertEquals(expected, actual, "tz:" + tz.getID() + " locale:" + locale.getDisplayName());
             }
         }
     }
 
     private void validateSdfFormatFdpParseEquality(final String formatStr, final Locale locale, final TimeZone timeZone,
-        final FastDateParser dateParser, final Date inDate, final int year, final Date csDate) throws ParseException {
+        final DateParser dateParser, final Date inDate, final int year, final Date csDate) throws ParseException {
         final SimpleDateFormat sdf = new SimpleDateFormat(formatStr, locale);
         sdf.setTimeZone(timeZone);
         if (formatStr.equals(SHORT_FORMAT)) {
             sdf.set2DigitYearStart(csDate);
         }
         final String fmt = sdf.format(inDate);
-//        System.out.printf("[Java %s] Date: '%s' formated with '%s' -> '%s'%n", SystemUtils.JAVA_RUNTIME_VERSION, inDate,
-//            formatStr, fmt);
         try {
             final Date out = dateParser.parse(fmt);
-            assertEquals(inDate, out, "format: '" + formatStr + "', locale: '" + locale + "', time zone: '"
-                + timeZone.getID() + "', year: " + year + ", parse: '" + fmt);
+            assertEquals(inDate, out, "Locale: '" + locale + "', parse: '" + fmt + "', format: '" + formatStr
+                + "', time zone: '" + timeZone.getID() + "'");
         } catch (final ParseException pe) {
             if (year >= 1868 || !locale.getCountry().equals("JP")) {
                 // LANG-978

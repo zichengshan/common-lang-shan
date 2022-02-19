@@ -164,7 +164,7 @@ public class FractionTest  {
 
     @Test
     public void testCompareTo() {
-        final Fraction f1;
+        Fraction f1;
         Fraction f2;
 
         f1 = Fraction.getFraction(3, 5);
@@ -237,7 +237,7 @@ public class FractionTest  {
 
     @Test
     public void testConversions() {
-        final Fraction f;
+        Fraction f;
 
         f = Fraction.getFraction(3, 7, 8);
         assertEquals(3, f.intValue());
