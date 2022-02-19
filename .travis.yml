@@ -1,17 +1,24 @@
-dist: xenial
-language: java
-cache:
-  directories:
-    - $HOME/.m2
-jdk:
-  - openjdk9
+
+# language: java
+# cache:
+#   directories:
+#     - $HOME/.m2
+# jdk:
+#   - openjdk9
   
 
-matrix:
-  allow_failures:
-    - jdk: openjdk-ea
-script:
-  - mvn -V --no-transfer-progress
+# matrix:
+#   allow_failures:
+#     - jdk: openjdk-ea
+# script:
+#   - mvn -V --no-transfer-progress
 
-after_success:
-  - mvn -V --no-transfer-progress clean test jacoco:report coveralls:report -Ptravis-jacoco javadoc:javadoc -Ddoclint=all
+# after_success:
+#   - mvn -V --no-transfer-progress clean test jacoco:report coveralls:report -Ptravis-jacoco javadoc:javadoc -Ddoclint=all
+
+language: java
+dist: xenial
+sudo: required
+
+jdk:
+  - openjdk11
