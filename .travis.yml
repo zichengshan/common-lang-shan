@@ -22,3 +22,6 @@ sudo: required
 
 jdk:
   - openjdk11
+  
+script:
+  - mvn clean install -DskipTests -Drat.skip=true
