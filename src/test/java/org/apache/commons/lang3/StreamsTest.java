@@ -84,8 +84,8 @@ public class StreamsTest {
 
     protected <T extends Throwable> FailableConsumer<String, T> asIntConsumer(final T pThrowable) {
         return s -> {
-            final Integer i = Integer.valueOf(s);
-            if (i.intValue() == 4) {
+            final int i = Integer.parseInt(s);
+            if (i == 4) {
                 throw pThrowable;
             }
         };
@@ -145,10 +145,8 @@ public class StreamsTest {
 
     protected <T extends Throwable> FailablePredicate<Integer, T> asIntPredicate(final T pThrowable) {
         return i -> {
-            if (i.intValue() == 5) {
-                if (pThrowable != null) {
-                    throw pThrowable;
-                }
+            if (i.intValue() == 5 && pThrowable != null) {
+                throw pThrowable;
             }
             return i%2==0;
         };

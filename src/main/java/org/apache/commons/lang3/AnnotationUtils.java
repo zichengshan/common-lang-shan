@@ -100,7 +100,6 @@ public class AnnotationUtils {
     public AnnotationUtils() {
     }
 
-    //-----------------------------------------------------------------------
     /**
      * <p>Checks if two annotations are equal using the criteria for equality
      * presented in the {@link Annotation#equals(Object)} API docs.</p>
@@ -232,7 +231,7 @@ public class AnnotationUtils {
      */
     private static int hashMember(final String name, final Object value) {
         final int part1 = name.hashCode() * 127;
-        if (value.getClass().isArray()) {
+        if (ObjectUtils.isArray(value)) {
             return part1 ^ arrayMemberHash(value.getClass().getComponentType(), value);
         }
         if (value instanceof Annotation) {

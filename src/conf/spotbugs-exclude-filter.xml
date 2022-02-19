@@ -23,6 +23,20 @@
 -->
 <FindBugsFilter>
 
+  <!-- https://github.com/spotbugs/spotbugs/issues/1504 -->
+  <Match>
+    <Class name="org.apache.commons.lang3.ArrayUtils" />
+    <Method name="shuffle" />
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
+  </Match>
+
+  <!-- https://github.com/spotbugs/spotbugs/issues/1504 -->
+  <Match>
+    <Class name="org.apache.commons.lang3.RandomStringUtils" />
+    <Method name="random" />
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
+  </Match>
+
   <Match>
     <Class name="org.apache.commons.lang3.ArrayUtils" />
     <Method name="addFirst" />
@@ -126,7 +140,7 @@
     <Bug pattern="SF_SWITCH_NO_DEFAULT" />
   </Match>
 
-  <!-- Reason: The fallthrough on the swich statement is intentional -->
+  <!-- Reason: The fallthrough on the switch statement is intentional -->
   <Match>
     <Class name="org.apache.commons.lang3.time.FastDatePrinter"/>
     <Method name="appendFullDigits" params="java.lang.Appendable, int, int"/>

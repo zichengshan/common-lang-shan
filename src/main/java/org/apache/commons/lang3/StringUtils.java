@@ -31,6 +31,7 @@ import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.function.Suppliers;
 import org.apache.commons.lang3.function.ToBooleanBiFunction;
 
 /**
@@ -340,7 +341,8 @@ public class StringUtils {
     public static String abbreviate(final String str, final String abbrevMarker, int offset, final int maxWidth) {
         if (isNotEmpty(str) && EMPTY.equals(abbrevMarker) && maxWidth > 0) {
             return substring(str, 0, maxWidth);
-        } else if (isAnyEmpty(str, abbrevMarker)) {
+        }
+        if (isAnyEmpty(str, abbrevMarker)) {
             return str;
         }
         final int abbrevMarkerLength = abbrevMarker.length();
@@ -520,7 +522,7 @@ public class StringUtils {
      * <p>Capitalizes a String changing the first character to title case as
      * per {@link Character#toTitleCase(int)}. No other characters are changed.</p>
      *
-     * <p>For a word based algorithm, see {@link org.apache.commons.lang3.text.WordUtils#capitalize(String)}.
+     * <p>For a word based algorithm, see {@link org.apache.commons.text.WordUtils#capitalize(String)}.
      * A {@code null} input String returns {@code null}.</p>
      *
      * <pre>
@@ -533,7 +535,7 @@ public class StringUtils {
      *
      * @param str the String to capitalize, may be null
      * @return the capitalized String, {@code null} if null String input
-     * @see org.apache.commons.lang3.text.WordUtils#capitalize(String)
+     * @see org.apache.commons.text.WordUtils#capitalize(String)
      * @see #uncapitalize(String)
      * @since 2.0
      */
@@ -1061,16 +1063,15 @@ public class StringUtils {
             final char ch = cs.charAt(i);
             for (int j = 0; j < searchLength; j++) {
                 if (searchChars[j] == ch) {
-                    if (Character.isHighSurrogate(ch)) {
-                        if (j == searchLast) {
-                            // missing low surrogate, fine, like String.indexOf(String)
-                            return true;
-                        }
-                        if (i < csLast && searchChars[j + 1] == cs.charAt(i + 1)) {
-                            return true;
-                        }
-                    } else {
+                    if (!Character.isHighSurrogate(ch)) {
                         // ch is in the Basic Multilingual Plane
+                        return true;
+                    }
+                    if (j == searchLast) {
+                        // missing low surrogate, fine, like String.indexOf(String)
+                        return true;
+                    }
+                    if (i < csLast && searchChars[j + 1] == cs.charAt(i + 1)) {
                         return true;
                     }
                 }
@@ -1283,16 +1284,15 @@ public class StringUtils {
             final char ch = cs.charAt(i);
             for (int j = 0; j < searchLen; j++) {
                 if (searchChars[j] == ch) {
-                    if (Character.isHighSurrogate(ch)) {
-                        if (j == searchLast) {
-                            // missing low surrogate, fine, like String.indexOf(String)
-                            return false;
-                        }
-                        if (i < csLast && searchChars[j + 1] == cs.charAt(i + 1)) {
-                            return false;
-                        }
-                    } else {
+                    if (!Character.isHighSurrogate(ch)) {
                         // ch is in the Basic Multilingual Plane
+                        return false;
+                    }
+                    if (j == searchLast) {
+                        // missing low surrogate, fine, like String.indexOf(String)
+                        return false;
+                    }
+                    if (i < csLast && searchChars[j + 1] == cs.charAt(i + 1)) {
                         return false;
                     }
                 }
@@ -1562,12 +1562,12 @@ public class StringUtils {
      *  was {@code null}
      */
     public static String defaultString(final String str) {
-        return defaultString(str, EMPTY);
+        return Objects.toString(str, EMPTY);
     }
 
     /**
-     * <p>Returns either the passed in String, or if the String is
-     * {@code null}, the value of {@code defaultStr}.</p>
+     * Returns either the given String, or if the String is
+     * {@code null}, {@code nullDefault}.
      *
      * <pre>
      * StringUtils.defaultString(null, "NULL")  = "NULL"
@@ -1575,15 +1575,17 @@ public class StringUtils {
      * StringUtils.defaultString("bat", "NULL") = "bat"
      * </pre>
      *
-     * @see ObjectUtils#toString(Object,String)
+     * @see Objects#toString(Object, String)
      * @see String#valueOf(Object)
      * @param str  the String to check, may be null
-     * @param defaultStr  the default String to return
+     * @param nullDefault  the default String to return
      *  if the input is {@code null}, may be null
      * @return the passed in String, or the default if it was {@code null}
+     * @deprecated Use {@link Objects#toString(Object, String)}
      */
-    public static String defaultString(final String str, final String defaultStr) {
-        return str == null ? defaultStr : str;
+    @Deprecated
+    public static String defaultString(final String str, final String nullDefault) {
+        return Objects.toString(str, nullDefault);
     }
 
     /**
@@ -2055,13 +2057,13 @@ public class StringUtils {
                 return EMPTY;
             }
             return strs[0];
-        } else if (smallestIndexOfDiff == 0) {
+        }
+        if (smallestIndexOfDiff == 0) {
             // there were no common initial characters
             return EMPTY;
-        } else {
-            // we found a common initial character sequence
-            return strs[0].substring(0, smallestIndexOfDiff);
         }
+        // we found a common initial character sequence
+        return strs[0].substring(0, smallestIndexOfDiff);
     }
 
     /**
@@ -2126,7 +2128,7 @@ public class StringUtils {
      * @return result score
      * @throws IllegalArgumentException if either String input {@code null} or Locale input {@code null}
      * @since 3.4
-     * @deprecated as of 3.6, use commons-text
+     * @deprecated As of 3.6, use Apache Commons Text
      * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/similarity/FuzzyScore.html">
      * FuzzyScore</a> instead
      */
@@ -2134,7 +2136,8 @@ public class StringUtils {
     public static int getFuzzyDistance(final CharSequence term, final CharSequence query, final Locale locale) {
         if (term == null || query == null) {
             throw new IllegalArgumentException("Strings must not be null");
-        } else if (locale == null) {
+        }
+        if (locale == null) {
             throw new IllegalArgumentException("Locale must not be null");
         }
 
@@ -2210,7 +2213,7 @@ public class StringUtils {
      * @since 3.10
      */
     public static <T extends CharSequence> T getIfBlank(final T str, final Supplier<T> defaultSupplier) {
-        return isBlank(str) ? defaultSupplier == null ? null : defaultSupplier.get() : str;
+        return isBlank(str) ? Suppliers.get(defaultSupplier) : str;
     }
 
     /**
@@ -2238,7 +2241,7 @@ public class StringUtils {
      * @since 3.10
      */
     public static <T extends CharSequence> T getIfEmpty(final T str, final Supplier<T> defaultSupplier) {
-        return isEmpty(str) ? defaultSupplier == null ? null : defaultSupplier.get() : str;
+        return isEmpty(str) ? Suppliers.get(defaultSupplier) : str;
     }
 
     /**
@@ -2272,7 +2275,7 @@ public class StringUtils {
      * @return result distance
      * @throws IllegalArgumentException if either String input {@code null}
      * @since 3.3
-     * @deprecated as of 3.6, use commons-text
+     * @deprecated As of 3.6, use Apache Commons Text
      * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/similarity/JaroWinklerDistance.html">
      * JaroWinklerDistance</a> instead
      */
@@ -2325,7 +2328,7 @@ public class StringUtils {
      * @throws IllegalArgumentException if either String input {@code null}
      * @since 3.0 Changed signature from getLevenshteinDistance(String, String) to
      * getLevenshteinDistance(CharSequence, CharSequence)
-     * @deprecated as of 3.6, use commons-text
+     * @deprecated As of 3.6, use Apache Commons Text
      * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/similarity/LevenshteinDistance.html">
      * LevenshteinDistance</a> instead
      */
@@ -2340,7 +2343,8 @@ public class StringUtils {
 
         if (n == 0) {
             return m;
-        } else if (m == 0) {
+        }
+        if (m == 0) {
             return n;
         }
 
@@ -2415,7 +2419,7 @@ public class StringUtils {
      * @param threshold the target threshold, must not be negative
      * @return result distance, or {@code -1} if the distance would be greater than the threshold
      * @throws IllegalArgumentException if either String input {@code null} or negative threshold
-     * @deprecated as of 3.6, use commons-text
+     * @deprecated As of 3.6, use Apache Commons Text
      * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/similarity/LevenshteinDistance.html">
      * LevenshteinDistance</a> instead
      */
@@ -2478,9 +2482,11 @@ public class StringUtils {
         // if one string is empty, the edit distance is necessarily the length of the other
         if (n == 0) {
             return m <= threshold ? m : -1;
-        } else if (m == 0) {
+        }
+        if (m == 0) {
             return n <= threshold ? n : -1;
-        } else if (Math.abs(n - m) > threshold) {
+        }
+        if (Math.abs(n - m) > threshold) {
             // no need to calculate the distance if the length difference is greater than the threshold
             return -1;
         }
@@ -2496,7 +2502,7 @@ public class StringUtils {
 
         int[] p = new int[n + 1]; // 'previous' cost array, horizontally
         int[] d = new int[n + 1]; // cost array, horizontally
-        int[] _d; // placeholder to assist in swapping p and d
+        int[] tmp; // placeholder to assist in swapping p and d
 
         // fill in starting table values
         final int boundary = Math.min(n, threshold) + 1;
@@ -2539,9 +2545,9 @@ public class StringUtils {
             }
 
             // copy current distance counts to 'previous row' distance counts
-            _d = p;
+            tmp = p;
             p = d;
-            d = _d;
+            d = tmp;
         }
 
         // if p[n] is greater than the threshold, there's no guarantee on it being the correct
@@ -2762,12 +2768,11 @@ public class StringUtils {
             final char ch = cs.charAt(i);
             for (int j = 0; j < searchLen; j++) {
                 if (searchChars[j] == ch) {
-                    if (i < csLast && j < searchLast && Character.isHighSurrogate(ch)) {
-                        // ch is a supplementary character
-                        if (searchChars[j + 1] == cs.charAt(i + 1)) {
-                            return i;
-                        }
-                    } else {
+                    if ((i >= csLast) || (j >= searchLast) || !Character.isHighSurrogate(ch)) {
+                        return i;
+                    }
+                    // ch is a supplementary character
+                    if (searchChars[j + 1] == cs.charAt(i + 1)) {
                         return i;
                     }
                 }
@@ -2811,7 +2816,7 @@ public class StringUtils {
         // String's can't have a MAX_VALUEth index.
         int ret = Integer.MAX_VALUE;
 
-        int tmp = 0;
+        int tmp;
         for (final CharSequence search : searchStrs) {
             if (search == null) {
                 continue;
@@ -2896,11 +2901,10 @@ public class StringUtils {
             final char ch = cs.charAt(i);
             for (int j = 0; j < searchLen; j++) {
                 if (searchChars[j] == ch) {
-                    if (i < csLast && j < searchLast && Character.isHighSurrogate(ch)) {
-                        if (searchChars[j + 1] == cs.charAt(i + 1)) {
-                            continue outer;
-                        }
-                    } else {
+                    if ((i >= csLast) || (j >= searchLast) || !Character.isHighSurrogate(ch)) {
+                        continue outer;
+                    }
+                    if (searchChars[j + 1] == cs.charAt(i + 1)) {
                         continue outer;
                     }
                 }
@@ -3636,7 +3640,8 @@ public class StringUtils {
         for (int i = 0; i < sz; i++) {
             if (containsUppercase && containsLowercase) {
                 return true;
-            } else if (Character.isUpperCase(cs.charAt(i))) {
+            }
+            if (Character.isUpperCase(cs.charAt(i))) {
                 containsUppercase = true;
             } else if (Character.isLowerCase(cs.charAt(i))) {
                 containsLowercase = true;
@@ -5074,7 +5079,7 @@ public class StringUtils {
             return INDEX_NOT_FOUND;
         }
         int ret = INDEX_NOT_FOUND;
-        int tmp = 0;
+        int tmp;
         for (final CharSequence search : searchStrs) {
             if (search == null) {
                 continue;
@@ -5344,16 +5349,16 @@ public class StringUtils {
 
         if (pads == padLen) {
             return padStr.concat(str);
-        } else if (pads < padLen) {
-            return padStr.substring(0, pads).concat(str);
-        } else {
-            final char[] padding = new char[pads];
-            final char[] padChars = padStr.toCharArray();
-            for (int i = 0; i < pads; i++) {
-                padding[i] = padChars[i % padLen];
-            }
-            return new String(padding).concat(str);
         }
+        if (pads < padLen) {
+            return padStr.substring(0, pads).concat(str);
+        }
+        final char[] padding = new char[pads];
+        final char[] padChars = padStr.toCharArray();
+        for (int i = 0; i < pads; i++) {
+            padding[i] = padChars[i % padLen];
+        }
+        return new String(padding).concat(str);
     }
 
     /**
@@ -5468,11 +5473,10 @@ public class StringUtils {
         }
         int prefix = 0;
         for (int mi = 0; mi < min.length(); mi++) {
-            if (first.charAt(mi) == second.charAt(mi)) {
-                prefix++;
-            } else {
+            if (first.charAt(mi) != second.charAt(mi)) {
                 break;
             }
+            prefix++;
         }
         return new int[] { matches, transpositions / 2, prefix, max.length() };
     }
@@ -6155,6 +6159,36 @@ public class StringUtils {
     }
 
     /**
+     * Removes a char only if it is at the beginning of a source string,
+     * otherwise returns the source string.
+     *
+     * <p>A {@code null} source string will return {@code null}.
+     * An empty ("") source string will return the empty string.
+     * A {@code null} search char will return the source string.</p>
+     *
+     * <pre>
+     * StringUtils.removeStart(null, *)      = null
+     * StringUtils.removeStart("", *)        = ""
+     * StringUtils.removeStart(*, null)      = *
+     * StringUtils.removeStart("/path", '/') = "path"
+     * StringUtils.removeStart("path", '/')  = "path"
+     * StringUtils.removeStart("path", 0)    = "path"
+     * </pre>
+     *
+     * @param str  the source String to search, may be null.
+     * @param remove  the char to search for and remove.
+     * @return the substring with the char removed if found,
+     *  {@code null} if null String input.
+     * @since 3.13.0
+     */
+    public static String removeStart(final String str, final char remove) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        return str.charAt(0) == remove ? str.substring(1) : str;
+    }
+
+    /**
      * <p>Removes a substring only if it is at the beginning of a source string,
      * otherwise returns the source string.</p>
      *
@@ -6732,7 +6766,7 @@ public class StringUtils {
         // index on index that the match was found
         int textIndex = -1;
         int replaceIndex = -1;
-        int tempIndex = -1;
+        int tempIndex;
 
         // index of replace array that will replace the search string found
         // NOTE: logic duplicated below START
@@ -6863,10 +6897,7 @@ public class StringUtils {
      * @since 2.4
      */
     public static String replaceEachRepeatedly(final String text, final String[] searchList, final String[] replacementList) {
-        // timeToLive should be 0 if not used or nothing to replace, else it's
-        // the length of the replace array
-        final int timeToLive = searchList == null ? 0 : searchList.length;
-        return replaceEach(text, searchList, replacementList, true, timeToLive);
+        return replaceEach(text, searchList, replacementList, true, ArrayUtils.getLength(searchList));
     }
 
     /**
@@ -6923,32 +6954,32 @@ public class StringUtils {
     }
 
     /**
-    * <p>Case insensitively replaces all occurrences of a String within another String.</p>
-    *
-    * <p>A {@code null} reference passed to this method is a no-op.</p>
-    *
-    * <pre>
-    * StringUtils.replaceIgnoreCase(null, *, *)        = null
-    * StringUtils.replaceIgnoreCase("", *, *)          = ""
-    * StringUtils.replaceIgnoreCase("any", null, *)    = "any"
-    * StringUtils.replaceIgnoreCase("any", *, null)    = "any"
-    * StringUtils.replaceIgnoreCase("any", "", *)      = "any"
-    * StringUtils.replaceIgnoreCase("aba", "a", null)  = "aba"
-    * StringUtils.replaceIgnoreCase("abA", "A", "")    = "b"
-    * StringUtils.replaceIgnoreCase("aba", "A", "z")   = "zbz"
-    * </pre>
-    *
-    * @see #replaceIgnoreCase(String text, String searchString, String replacement, int max)
-    * @param text  text to search and replace in, may be null
-    * @param searchString  the String to search for (case insensitive), may be null
-    * @param replacement  the String to replace it with, may be null
-    * @return the text with any replacements processed,
-    *  {@code null} if null String input
-    * @since 3.5
-    */
-   public static String replaceIgnoreCase(final String text, final String searchString, final String replacement) {
-       return replaceIgnoreCase(text, searchString, replacement, -1);
-   }
+     * <p>Case insensitively replaces all occurrences of a String within another String.</p>
+     *
+     * <p>A {@code null} reference passed to this method is a no-op.</p>
+     *
+     * <pre>
+     * StringUtils.replaceIgnoreCase(null, *, *)        = null
+     * StringUtils.replaceIgnoreCase("", *, *)          = ""
+     * StringUtils.replaceIgnoreCase("any", null, *)    = "any"
+     * StringUtils.replaceIgnoreCase("any", *, null)    = "any"
+     * StringUtils.replaceIgnoreCase("any", "", *)      = "any"
+     * StringUtils.replaceIgnoreCase("aba", "a", null)  = "aba"
+     * StringUtils.replaceIgnoreCase("abA", "A", "")    = "b"
+     * StringUtils.replaceIgnoreCase("aba", "A", "z")   = "zbz"
+     * </pre>
+     *
+     * @see #replaceIgnoreCase(String text, String searchString, String replacement, int max)
+     * @param text  text to search and replace in, may be null
+     * @param searchString  the String to search for (case insensitive), may be null
+     * @param replacement  the String to replace it with, may be null
+     * @return the text with any replacements processed,
+     *  {@code null} if null String input
+     * @since 3.5
+     */
+     public static String replaceIgnoreCase(final String text, final String searchString, final String replacement) {
+         return replaceIgnoreCase(text, searchString, replacement, -1);
+     }
 
     /**
      * <p>Case insensitively replaces a String with another String inside a larger String,
@@ -7269,16 +7300,16 @@ public class StringUtils {
 
         if (pads == padLen) {
             return str.concat(padStr);
-        } else if (pads < padLen) {
-            return str.concat(padStr.substring(0, pads));
-        } else {
-            final char[] padding = new char[pads];
-            final char[] padChars = padStr.toCharArray();
-            for (int i = 0; i < pads; i++) {
-                padding[i] = padChars[i % padLen];
-            }
-            return str.concat(new String(padding));
         }
+        if (pads < padLen) {
+            return str.concat(padStr.substring(0, pads));
+        }
+        final char[] padding = new char[pads];
+        final char[] padChars = padStr.toCharArray();
+        for (int i = 0; i < pads; i++) {
+            padding[i] = padChars[i % padLen];
+        }
+        return str.concat(new String(padding));
     }
 
     /**
@@ -8558,7 +8589,7 @@ public class StringUtils {
      * </pre>
      *
      * @param str  the String to get a substring from, may be null
-     * @param separator  the character to search.
+     * @param separator  the character (Unicode code point) to search.
      * @return the substring after the first occurrence of the separator,
      *  {@code null} if null String input
      * @since 3.11
@@ -8637,7 +8668,7 @@ public class StringUtils {
      * </pre>
      *
      * @param str  the String to get a substring from, may be null
-     * @param separator  the String to search for, may be null
+     * @param separator  the character (Unicode code point) to search.
      * @return the substring after the last occurrence of the separator,
      *  {@code null} if null String input
      * @since 3.11
@@ -8719,7 +8750,7 @@ public class StringUtils {
      * </pre>
      *
      * @param str the String to get a substring from, may be null
-     * @param separator the String to search for, may be null
+     * @param separator the character (Unicode code point) to search.
      * @return the substring before the first occurrence of the separator, {@code null} if null String input
      * @since 3.12.0
      */
@@ -8942,7 +8973,7 @@ public class StringUtils {
      *  <li>Lower case character converts to Upper case</li>
      * </ul>
      *
-     * <p>For a word based algorithm, see {@link org.apache.commons.lang3.text.WordUtils#swapCase(String)}.
+     * <p>For a word based algorithm, see {@link org.apache.commons.text.WordUtils#swapCase(String)}.
      * A {@code null} input String returns {@code null}.</p>
      *
      * <pre>
@@ -9279,7 +9310,7 @@ public class StringUtils {
      * <p>Uncapitalizes a String, changing the first character to lower case as
      * per {@link Character#toLowerCase(int)}. No other characters are changed.</p>
      *
-     * <p>For a word based algorithm, see {@link org.apache.commons.lang3.text.WordUtils#uncapitalize(String)}.
+     * <p>For a word based algorithm, see {@link org.apache.commons.text.WordUtils#uncapitalize(String)}.
      * A {@code null} input String returns {@code null}.</p>
      *
      * <pre>
@@ -9292,7 +9323,7 @@ public class StringUtils {
      *
      * @param str the String to uncapitalize, may be null
      * @return the uncapitalized String, {@code null} if null String input
-     * @see org.apache.commons.lang3.text.WordUtils#uncapitalize(String)
+     * @see org.apache.commons.text.WordUtils#uncapitalize(String)
      * @see #capitalize(String)
      * @since 2.0
      */

@@ -257,14 +257,14 @@ public final class Fraction extends Number implements Comparable<Fraction> {
         int denom0 = 1; // the pre-previous
         int numer1 = 1; // the previous
         int denom1 = 0; // the previous
-        int numer2 = 0; // the current, setup in calculation
-        int denom2 = 0; // the current, setup in calculation
+        int numer2; // the current, setup in calculation
+        int denom2; // the current, setup in calculation
         int a1 = (int) value;
-        int a2 = 0;
+        int a2;
         double x1 = 1;
-        double x2 = 0;
+        double x2;
         double y1 = value - a1;
-        double y2 = 0;
+        double y2;
         double delta1, delta2 = Double.MAX_VALUE;
         double fraction;
         int i = 1;
@@ -535,20 +535,21 @@ public final class Fraction extends Number implements Comparable<Fraction> {
     public Fraction pow(final int power) {
         if (power == 1) {
             return this;
-        } else if (power == 0) {
+        }
+        if (power == 0) {
             return ONE;
-        } else if (power < 0) {
+        }
+        if (power < 0) {
             if (power == Integer.MIN_VALUE) { // MIN_VALUE can't be negated.
                 return this.invert().pow(2).pow(-(power / 2));
             }
             return this.invert().pow(-power);
-        } else {
-            final Fraction f = this.multiplyBy(this);
-            if (power % 2 == 0) { // if even...
-                return f.pow(power / 2);
-            }
-            return f.pow(power / 2).multiplyBy(this);
         }
+        final Fraction f = this.multiplyBy(this);
+        if (power % 2 == 0) { // if even...
+            return f.pow(power / 2);
+        }
+        return f.pow(power / 2).multiplyBy(this);
     }
 
     /**

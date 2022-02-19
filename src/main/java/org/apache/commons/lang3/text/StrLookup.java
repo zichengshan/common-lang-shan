@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * @param <V> Unused.
  * @since 2.2
- * @deprecated as of 3.6, use commons-text
+ * @deprecated As of 3.6, use Apache Commons Text
  * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/lookup/StringLookupFactory.html">
  * StringLookupFactory</a> instead
  */
@@ -50,7 +50,6 @@ public abstract class StrLookup<V> {
      */
     private static final StrLookup<String> SYSTEM_PROPERTIES_LOOKUP = new SystemPropertiesStrLookup();
 
-    //-----------------------------------------------------------------------
     /**
      * Returns a lookup which always returns null.
      *
@@ -89,7 +88,6 @@ public abstract class StrLookup<V> {
         return new MapStrLookup<>(map);
     }
 
-    //-----------------------------------------------------------------------
     /**
      * Constructor.
      */
@@ -121,9 +119,10 @@ public abstract class StrLookup<V> {
      */
     public abstract String lookup(String key);
 
-    //-----------------------------------------------------------------------
     /**
      * Lookup implementation that uses a Map.
+     *
+     * @param <V> the type of mapped values.
      */
     static class MapStrLookup<V> extends StrLookup<V> {
 
@@ -161,7 +160,6 @@ public abstract class StrLookup<V> {
         }
     }
 
-    //-----------------------------------------------------------------------
     /**
      * Lookup implementation based on system properties.
      */

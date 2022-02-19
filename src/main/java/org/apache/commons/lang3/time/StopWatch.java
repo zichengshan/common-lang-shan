@@ -249,9 +249,9 @@ public class StopWatch {
     }
 
     /**
-     * Returns the time formatted by {@link DurationFormatUtils#formatDurationHMS}.
+     * Returns the split time formatted by {@link DurationFormatUtils#formatDurationHMS}.
      *
-     * @return the time formatted by {@link DurationFormatUtils#formatDurationHMS}.
+     * @return the split time formatted by {@link DurationFormatUtils#formatDurationHMS}.
      * @since 3.10
      */
     public String formatSplitTime() {
@@ -259,9 +259,9 @@ public class StopWatch {
     }
 
     /**
-     * Returns the split time formatted by {@link DurationFormatUtils#formatDurationHMS}.
+     * Returns the time formatted by {@link DurationFormatUtils#formatDurationHMS}.
      *
-     * @return the split time formatted by {@link DurationFormatUtils#formatDurationHMS}.
+     * @return the time formatted by {@link DurationFormatUtils#formatDurationHMS}.
      * @since 3.10
      */
     public String formatTime() {
@@ -295,9 +295,11 @@ public class StopWatch {
     public long getNanoTime() {
         if (this.runningState == State.STOPPED || this.runningState == State.SUSPENDED) {
             return this.stopTimeNanos - this.startTimeNanos;
-        } else if (this.runningState == State.UNSTARTED) {
+        }
+        if (this.runningState == State.UNSTARTED) {
             return 0;
-        } else if (this.runningState == State.RUNNING) {
+        }
+        if (this.runningState == State.RUNNING) {
             return System.nanoTime() - this.startTimeNanos;
         }
         throw new IllegalStateException("Illegal running state has occurred.");

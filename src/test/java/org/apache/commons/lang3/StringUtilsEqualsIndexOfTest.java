@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3;
 
+import static org.apache.commons.lang3.Supplementary.CharU20000;
+import static org.apache.commons.lang3.Supplementary.CharU20001;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,23 +33,14 @@ import org.junit.jupiter.api.Test;
  * Unit tests {@link org.apache.commons.lang3.StringUtils} - Equals/IndexOf methods
  */
 public class StringUtilsEqualsIndexOfTest  {
+
     private static final String BAR = "bar";
-    /**
-     * Supplementary character U+20000
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
-     */
-    private static final String CharU20000 = "\uD840\uDC00";
-    /**
-     * Supplementary character U+20001
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
-     */
-    private static final String CharU20001 = "\uD840\uDC01";
 
     private static final String FOO = "foo";
 
     private static final String FOOBAR = "foobar";
 
-    private static final String[] FOOBAR_SUB_ARRAY = new String[] {"ob", "ba"};
+    private static final String[] FOOBAR_SUB_ARRAY = {"ob", "ba"};
 
     // The purpose of this class is to test StringUtils#equals(CharSequence, CharSequence)
     // with a CharSequence implementation whose equals(Object) override requires that the
@@ -198,7 +191,6 @@ public class StringUtilsEqualsIndexOfTest  {
         assertTrue(StringUtils.equalsAnyIgnoreCase(FOO, new StringBuilder("fOo")));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testCompare_StringString() {
         assertEquals(0, StringUtils.compare(null, null));
@@ -267,7 +259,6 @@ public class StringUtilsEqualsIndexOfTest  {
         assertTrue(StringUtils.compareIgnoreCase("abc", "AB ", false) > 0);
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testIndexOf_char() {
         assertEquals(-1, StringUtils.indexOf(null, ' '));

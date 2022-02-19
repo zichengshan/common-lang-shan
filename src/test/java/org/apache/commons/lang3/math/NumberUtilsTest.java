@@ -68,11 +68,12 @@ public class NumberUtilsTest {
             + " for isCreatable/createNumber using \"" + val + "\" but got " + isValid + " and " + canCreate);
     }
 
+    @SuppressWarnings("deprecation")
     private void compareIsNumberWithCreateNumber(final String val, final boolean expected) {
-        final boolean isValid = NumberUtils.isCreatable(val);
+        final boolean isValid = NumberUtils.isNumber(val);
         final boolean canCreate = checkCreateNumber(val);
         assertTrue(isValid == expected && canCreate == expected, "Expecting " + expected
-            + " for isCreatable/createNumber using \"" + val + "\" but got " + isValid + " and " + canCreate);
+            + " for isNumber/createNumber using \"" + val + "\" but got " + isValid + " and " + canCreate);
     }
 
     @Test
@@ -396,6 +397,10 @@ public class NumberUtilsTest {
         testCreateBigIntegerFailure("-#");
         testCreateBigIntegerFailure("0x");
         testCreateBigIntegerFailure("-0x");
+        // LANG-1645
+        assertEquals(new BigInteger("+FFFFFFFFFFFFFFFF", 16), NumberUtils.createBigInteger("+0xFFFFFFFFFFFFFFFF"));
+        assertEquals(new BigInteger("+FFFFFFFFFFFFFFFF", 16), NumberUtils.createBigInteger("+#FFFFFFFFFFFFFFFF"));
+        assertEquals(new BigInteger("+1234567", 8), NumberUtils.createBigInteger("+01234567"));
     }
 
     protected void testCreateBigIntegerFailure(final String str) {
@@ -444,6 +449,8 @@ public class NumberUtilsTest {
         this.testCreateIntegerFailure("\b\t\n\f\r");
         // Funky whitespaces
         this.testCreateIntegerFailure("\u00A0\uFEFF\u000B\u000C\u001C\u001D\u001E\u001F");
+        // LANG-1645
+        assertEquals(Integer.decode("+0xF"), NumberUtils.createInteger("+0xF"));
     }
 
     protected void testCreateIntegerFailure(final String str) {
@@ -460,6 +467,8 @@ public class NumberUtilsTest {
         this.testCreateLongFailure("\b\t\n\f\r");
         // Funky whitespaces
         this.testCreateLongFailure("\u00A0\uFEFF\u000B\u000C\u001C\u001D\u001E\u001F");
+        // LANG-1645
+        assertEquals(Long.decode("+0xFFFFFFFF"), NumberUtils.createLong("+0xFFFFFFFF"));
     }
 
     protected void testCreateLongFailure(final String str) {
@@ -560,6 +569,13 @@ public class NumberUtilsTest {
             "createNumber(String) LANG-1060m failed");
         assertEquals(Double.valueOf("-001.1E200"), NumberUtils.createNumber("-001.1E200"),
             "createNumber(String) LANG-1060n failed");
+        // LANG-1645
+        assertEquals(Integer.decode("+0xF"), NumberUtils.createNumber("+0xF"),
+            "createNumber(String) LANG-1645a failed");
+        assertEquals(Long.decode("+0xFFFFFFFF"), NumberUtils.createNumber("+0xFFFFFFFF"),
+            "createNumber(String) LANG-1645b failed");
+        assertEquals(new BigInteger("+FFFFFFFFFFFFFFFF", 16), NumberUtils.createNumber("+0xFFFFFFFFFFFFFFFF"),
+            "createNumber(String) LANG-1645c failed");
     }
 
     @Test
@@ -623,6 +639,22 @@ public class NumberUtilsTest {
         // Test with +2 in final digit (+1 does not cause roll-over to BigDecimal)
         assertEquals(new BigDecimal("1.7976931348623159e+308"), NumberUtils.createNumber("1.7976931348623159e+308"));
 
+        // Requested type is parsed as zero but the value is not zero
+        final Double nonZero1 = Double.valueOf(((double) Float.MIN_VALUE) / 2);
+        assertEquals(nonZero1, NumberUtils.createNumber(nonZero1.toString()));
+        assertEquals(nonZero1, NumberUtils.createNumber(nonZero1.toString() + "F"));
+        // Smallest double is 4.9e-324.
+        // Test a number with zero before and/or after the decimal place to hit edge cases.
+        final BigDecimal nonZero2 = new BigDecimal("4.9e-325");
+        assertEquals(nonZero2, NumberUtils.createNumber("4.9e-325"));
+        assertEquals(nonZero2, NumberUtils.createNumber("4.9e-325D"));
+        final BigDecimal nonZero3 = new BigDecimal("1e-325");
+        assertEquals(nonZero3, NumberUtils.createNumber("1e-325"));
+        assertEquals(nonZero3, NumberUtils.createNumber("1e-325D"));
+        final BigDecimal nonZero4 = new BigDecimal("0.1e-325");
+        assertEquals(nonZero4, NumberUtils.createNumber("0.1e-325"));
+        assertEquals(nonZero4, NumberUtils.createNumber("0.1e-325D"));
+
         assertEquals(Integer.valueOf(0x12345678), NumberUtils.createNumber("0x12345678"));
         assertEquals(Long.valueOf(0x123456789L), NumberUtils.createNumber("0x123456789"));
 
@@ -640,6 +672,55 @@ public class NumberUtilsTest {
         assertEquals(Long.valueOf(0777777777777777777777L), NumberUtils.createNumber("0777777777777777777777"));
         // 64 bits
         assertEquals(new BigInteger("1777777777777777777777", 8), NumberUtils.createNumber("01777777777777777777777"));
+    }
+
+    /**
+     * LANG-1646: Support the requested Number type (Long, Float, Double) of valid zero input.
+     */
+    @Test
+    public void testCreateNumberZero() {
+        // Handle integers
+        assertEquals(Integer.valueOf(0), NumberUtils.createNumber("0"));
+        assertEquals(Integer.valueOf(0), NumberUtils.createNumber("-0"));
+        assertEquals(Long.valueOf(0), NumberUtils.createNumber("0L"));
+        assertEquals(Long.valueOf(0), NumberUtils.createNumber("-0L"));
+
+        // Handle floating-point with optional leading sign, trailing exponent (eX)
+        // and format specifier (F or D).
+        // This should allow: 0. ; .0 ; 0.0 ; 0 (if exponent or format specifier is present)
+
+        // Exponent does not matter for zero
+        final int[] exponents = {-2345, 0, 13};
+        final String[] zeros = {"0.", ".0", "0.0", "0"};
+        final Float f0 = Float.valueOf(0);
+        final Float fn0 = Float.valueOf(-0F);
+        final Double d0 = Double.valueOf(0);
+        final Double dn0 = Double.valueOf(-0D);
+
+        for (final String zero : zeros) {
+            // Assume float if no preference.
+            // This requires a decimal point if there is no exponent.
+            if (zero.indexOf('.') != -1) {
+                assertCreateNumberZero(zero, f0, fn0);
+            }
+            for (final int exp : exponents) {
+                assertCreateNumberZero(zero + "e" + exp, f0, fn0);
+            }
+            // Type preference
+            assertCreateNumberZero(zero + "F", f0, fn0);
+            assertCreateNumberZero(zero + "D", d0, dn0);
+            for (final int exp : exponents) {
+                final String number = zero + "e" + exp;
+                assertCreateNumberZero(number + "F", f0, fn0);
+                assertCreateNumberZero(number + "D", d0, dn0);
+            }
+        }
+    }
+
+    private static void assertCreateNumberZero(final String number, final Object zero, final Object negativeZero) {
+        assertEquals(zero, NumberUtils.createNumber(number), () -> "Input: " + number);
+        assertEquals(zero, NumberUtils.createNumber("+" + number), () -> "Input: +" + number);
+        assertEquals(negativeZero, NumberUtils.createNumber("-" + number), () -> "Input: -" + number);
     }
 
     /**
@@ -699,6 +780,17 @@ public class NumberUtilsTest {
 
         compareIsCreatableWithCreateNumber("2.", true); // LANG-521
         compareIsCreatableWithCreateNumber("1.1L", false); // LANG-664
+        compareIsCreatableWithCreateNumber("+0xF", true); // LANG-1645
+        compareIsCreatableWithCreateNumber("+0xFFFFFFFF", true); // LANG-1645
+        compareIsCreatableWithCreateNumber("+0xFFFFFFFFFFFFFFFF", true); // LANG-1645
+        compareIsCreatableWithCreateNumber(".0", true); // LANG-1646
+        compareIsCreatableWithCreateNumber("0.", true); // LANG-1646
+        compareIsCreatableWithCreateNumber("0.D", true); // LANG-1646
+        compareIsCreatableWithCreateNumber("0e1", true); // LANG-1646
+        compareIsCreatableWithCreateNumber("0e1D", true); // LANG-1646
+        compareIsCreatableWithCreateNumber(".D", false); // LANG-1646
+        compareIsCreatableWithCreateNumber(".e10", false); // LANG-1646
+        compareIsCreatableWithCreateNumber(".e10D", false); // LANG-1646
     }
 
     @Test
@@ -774,6 +866,17 @@ public class NumberUtilsTest {
 
         compareIsNumberWithCreateNumber("2.", true); // LANG-521
         compareIsNumberWithCreateNumber("1.1L", false); // LANG-664
+        compareIsNumberWithCreateNumber("+0xF", true); // LANG-1645
+        compareIsNumberWithCreateNumber("+0xFFFFFFFF", true); // LANG-1645
+        compareIsNumberWithCreateNumber("+0xFFFFFFFFFFFFFFFF", true); // LANG-1645
+        compareIsNumberWithCreateNumber(".0", true); // LANG-1646
+        compareIsNumberWithCreateNumber("0.", true); // LANG-1646
+        compareIsNumberWithCreateNumber("0.D", true); // LANG-1646
+        compareIsNumberWithCreateNumber("0e1", true); // LANG-1646
+        compareIsNumberWithCreateNumber("0e1D", true); // LANG-1646
+        compareIsNumberWithCreateNumber(".D", false); // LANG-1646
+        compareIsNumberWithCreateNumber(".e10", false); // LANG-1646
+        compareIsNumberWithCreateNumber(".e10D", false); // LANG-1646
     }
 
     @Test
@@ -864,18 +967,18 @@ public class NumberUtilsTest {
         assertTrue(Float.isNaN(NumberUtils.min(1.2f, 2.5f, Float.NaN)));
         assertTrue(Float.isNaN(NumberUtils.max(1.2f, 2.5f, Float.NaN)));
 
-        final double[] a = new double[] {1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN};
+        final double[] a = {1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN};
         assertTrue(Double.isNaN(NumberUtils.max(a)));
         assertTrue(Double.isNaN(NumberUtils.min(a)));
 
-        final double[] b = new double[] {Double.NaN, 1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN};
+        final double[] b = {Double.NaN, 1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN};
         assertTrue(Double.isNaN(NumberUtils.max(b)));
         assertTrue(Double.isNaN(NumberUtils.min(b)));
 
-        final float[] aF = new float[] {1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN};
+        final float[] aF = {1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN};
         assertTrue(Float.isNaN(NumberUtils.max(aF)));
 
-        final float[] bF = new float[] {Float.NaN, 1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN};
+        final float[] bF = {Float.NaN, 1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN};
         assertTrue(Float.isNaN(NumberUtils.max(bF)));
     }
 

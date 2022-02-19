@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class CompareToBuilderTest {
 
-    //-----------------------------------------------------------------------
 
     static class TestObject implements Comparable<TestObject> {
         private int a;
@@ -128,7 +127,7 @@ public class CompareToBuilderTest {
 
     @Test
     public void testReflectionHierarchyCompareExcludeFields() {
-        final String[] excludeFields = new String[] { "b" };
+        final String[] excludeFields = { "b" };
         testReflectionHierarchyCompare(true, excludeFields);
 
         TestSubObject x;

@@ -16,11 +16,12 @@
  */
 package org.apache.commons.lang3.reflect;
 
+import static java.util.stream.Collectors.toList;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
@@ -33,13 +34,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.ClassUtils.Interfaces;
 import org.apache.commons.lang3.Validate;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * <p>Utility reflection methods focused on {@link Method}s, originally from Commons BeanUtils.
@@ -149,8 +149,7 @@ public class MethodUtils {
             Object... args) throws NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
         args = ArrayUtils.nullToEmpty(args);
-        final Class<?>[] parameterTypes = ClassUtils.toClass(args);
-        return invokeMethod(object, methodName, args, parameterTypes);
+        return invokeMethod(object, methodName, args, ClassUtils.toClass(args));
     }
 
     /**
@@ -180,8 +179,7 @@ public class MethodUtils {
             Object... args) throws NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
         args = ArrayUtils.nullToEmpty(args);
-        final Class<?>[] parameterTypes = ClassUtils.toClass(args);
-        return invokeMethod(object, forceAccess, methodName, args, parameterTypes);
+        return invokeMethod(object, forceAccess, methodName, args, ClassUtils.toClass(args));
     }
 
     /**
@@ -210,7 +208,7 @@ public class MethodUtils {
         args = ArrayUtils.nullToEmpty(args);
 
         final String messagePrefix;
-        Method method = null;
+        final Method method;
 
         if (forceAccess) {
             messagePrefix = "No such method: ";
@@ -306,8 +304,7 @@ public class MethodUtils {
             Object... args) throws NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
         args = ArrayUtils.nullToEmpty(args);
-        final Class<?>[] parameterTypes = ClassUtils.toClass(args);
-        return invokeExactMethod(object, methodName, args, parameterTypes);
+        return invokeExactMethod(object, methodName, args, ClassUtils.toClass(args));
     }
 
     /**
@@ -406,8 +403,7 @@ public class MethodUtils {
             Object... args) throws NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
         args = ArrayUtils.nullToEmpty(args);
-        final Class<?>[] parameterTypes = ClassUtils.toClass(args);
-        return invokeStaticMethod(cls, methodName, args, parameterTypes);
+        return invokeStaticMethod(cls, methodName, args, ClassUtils.toClass(args));
     }
 
     /**
@@ -521,8 +517,7 @@ public class MethodUtils {
             Object... args) throws NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
         args = ArrayUtils.nullToEmpty(args);
-        final Class<?>[] parameterTypes = ClassUtils.toClass(args);
-        return invokeExactStaticMethod(cls, methodName, args, parameterTypes);
+        return invokeExactStaticMethod(cls, methodName, args, ClassUtils.toClass(args));
     }
 
     /**
@@ -538,10 +533,9 @@ public class MethodUtils {
      * @return The accessible method
      */
     public static Method getAccessibleMethod(final Class<?> cls, final String methodName,
-            final Class<?>... parameterTypes) {
+        final Class<?>... parameterTypes) {
         try {
-            return getAccessibleMethod(cls.getMethod(methodName,
-                    parameterTypes));
+            return getAccessibleMethod(cls.getMethod(methodName, parameterTypes));
         } catch (final NoSuchMethodException e) {
             return null;
         }
@@ -561,7 +555,7 @@ public class MethodUtils {
         }
         // If the declaring class is public, we are done
         final Class<?> cls = method.getDeclaringClass();
-        if (Modifier.isPublic(cls.getModifiers())) {
+        if (ClassUtils.isPublic(cls)) {
             return method;
         }
         final String methodName = method.getName();
@@ -593,7 +587,7 @@ public class MethodUtils {
             final String methodName, final Class<?>... parameterTypes) {
         Class<?> parentClass = cls.getSuperclass();
         while (parentClass != null) {
-            if (Modifier.isPublic(parentClass.getModifiers())) {
+            if (ClassUtils.isPublic(parentClass)) {
                 try {
                     return parentClass.getMethod(methodName, parameterTypes);
                 } catch (final NoSuchMethodException e) {
@@ -629,7 +623,7 @@ public class MethodUtils {
             final Class<?>[] interfaces = cls.getInterfaces();
             for (final Class<?> anInterface : interfaces) {
                 // Is this interface public?
-                if (!Modifier.isPublic(anInterface.getModifiers())) {
+                if (!ClassUtils.isPublic(anInterface)) {
                     continue;
                 }
                 // Does the method exist on this interface?
@@ -690,7 +684,7 @@ public class MethodUtils {
             // compare name and parameters
             if (method.getName().equals(methodName) &&
                     MemberUtils.isMatchingMethod(method, parameterTypes)) {
-                matchingMethods.add (method);
+                matchingMethods.add(method);
             }
         }
 
@@ -718,8 +712,8 @@ public class MethodUtils {
             final String methodParameterComponentTypeName = ClassUtils.primitiveToWrapper(methodParameterComponentType).getName();
 
             final Class<?> lastParameterType = parameterTypes[parameterTypes.length - 1];
-            final String parameterTypeName = (lastParameterType==null) ? null : lastParameterType.getName();
-            final String parameterTypeSuperClassName = (lastParameterType==null) ? null : lastParameterType.getSuperclass().getName();
+            final String parameterTypeName = lastParameterType==null ? null : lastParameterType.getName();
+            final String parameterTypeSuperClassName = lastParameterType==null ? null : lastParameterType.getSuperclass().getName();
 
             if (parameterTypeName!= null && parameterTypeSuperClassName != null && !methodParameterComponentTypeName.equals(parameterTypeName)
                     && !methodParameterComponentTypeName.equals(parameterTypeSuperClassName)) {
@@ -745,13 +739,13 @@ public class MethodUtils {
         Validate.notNull(cls, "cls");
         Validate.notEmpty(methodName, "methodName");
 
-        final List<Method> methods = Arrays.stream(cls.getDeclaredMethods())
+        final List<Method> methods = Stream.of(cls.getDeclaredMethods())
                 .filter(method -> method.getName().equals(methodName))
                 .collect(toList());
 
         ClassUtils.getAllSuperclasses(cls).stream()
                 .map(Class::getDeclaredMethods)
-                .flatMap(Arrays::stream)
+                .flatMap(Stream::of)
                 .filter(method -> method.getName().equals(methodName))
                 .forEach(methods::add);
 
@@ -782,7 +776,7 @@ public class MethodUtils {
 
         throw new IllegalStateException(
                 String.format("Found multiple candidates for method %s on class %s : %s",
-                        methodName + Arrays.stream(parameterTypes).map(String::valueOf).collect(Collectors.joining(",", "(", ")")),
+                        methodName + Stream.of(parameterTypes).map(String::valueOf).collect(Collectors.joining(",", "(", ")")),
                         cls.getName(),
                         bestCandidates.stream().map(Method::toString).collect(Collectors.joining(",", "[", "]")))
         );
@@ -807,7 +801,8 @@ public class MethodUtils {
             final Class<?> toClass = toClassArray[offset];
             if (aClass == null || aClass.equals(toClass)) {
                 continue;
-            } else if (ClassUtils.isAssignable(aClass, toClass, true)
+            }
+            if (ClassUtils.isAssignable(aClass, toClass, true)
                     && !ClassUtils.isAssignable(aClass, toClass, false)) {
                 answer++;
             } else {
@@ -907,10 +902,8 @@ public class MethodUtils {
      * @since 3.6
      */
     public static Method[] getMethodsWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls,
-                                                    final boolean searchSupers, final boolean ignoreAccess) {
-        final List<Method> annotatedMethodsList = getMethodsListWithAnnotation(cls, annotationCls, searchSupers,
-                ignoreAccess);
-        return annotatedMethodsList.toArray(ArrayUtils.EMPTY_METHOD_ARRAY);
+        final boolean searchSupers, final boolean ignoreAccess) {
+        return getMethodsListWithAnnotation(cls, annotationCls, searchSupers, ignoreAccess).toArray(ArrayUtils.EMPTY_METHOD_ARRAY);
     }
 
     /**
@@ -933,17 +926,12 @@ public class MethodUtils {
 
         Validate.notNull(cls, "cls");
         Validate.notNull(annotationCls, "annotationCls");
-        final List<Class<?>> classes = (searchSupers ? getAllSuperclassesAndInterfaces(cls)
-                : new ArrayList<>());
+        final List<Class<?>> classes = searchSupers ? getAllSuperclassesAndInterfaces(cls) : new ArrayList<>();
         classes.add(0, cls);
         final List<Method> annotatedMethods = new ArrayList<>();
         for (final Class<?> acls : classes) {
-            final Method[] methods = (ignoreAccess ? acls.getDeclaredMethods() : acls.getMethods());
-            for (final Method method : methods) {
-                if (method.getAnnotation(annotationCls) != null) {
-                    annotatedMethods.add(method);
-                }
-            }
+            final Method[] methods = ignoreAccess ? acls.getDeclaredMethods() : acls.getMethods();
+            Stream.of(methods).filter(method -> method.isAnnotationPresent(annotationCls)).forEachOrdered(annotatedMethods::add);
         }
         return annotatedMethods;
     }
@@ -985,8 +973,8 @@ public class MethodUtils {
             final Class<?> mcls = method.getDeclaringClass();
             final List<Class<?>> classes = getAllSuperclassesAndInterfaces(mcls);
             for (final Class<?> acls : classes) {
-                final Method equivalentMethod = (ignoreAccess ? MethodUtils.getMatchingMethod(acls, method.getName(), method.getParameterTypes())
-                    : MethodUtils.getMatchingAccessibleMethod(acls, method.getName(), method.getParameterTypes()));
+                final Method equivalentMethod = ignoreAccess ? MethodUtils.getMatchingMethod(acls, method.getName(), method.getParameterTypes())
+                    : MethodUtils.getMatchingAccessibleMethod(acls, method.getName(), method.getParameterTypes());
                 if (equivalentMethod != null) {
                     annotation = equivalentMethod.getAnnotation(annotationCls);
                     if (annotation != null) {

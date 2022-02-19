@@ -29,7 +29,6 @@ import org.apache.commons.lang3.math.NumberUtils;
  * @since 2.0
  */
 public class BooleanUtils {
-
     /**
      * The false String {@code "false"}.
      *
@@ -86,18 +85,12 @@ public class BooleanUtils {
      * @param array  an array of {@code boolean}s
      * @return the result of the logical 'and' operation. That is {@code false}
      * if any of the parameters is {@code false} and {@code true} otherwise.
-     * @throws IllegalArgumentException if {@code array} is {@code null}
+     * @throws NullPointerException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty.
      * @since 3.0.1
      */
     public static boolean and(final boolean... array) {
-        // Validates input
-        if (array == null) {
-            throw new IllegalArgumentException("The Array must not be null");
-        }
-        if (array.length == 0) {
-            throw new IllegalArgumentException("Array is empty");
-        }
+        ObjectUtils.requireNonEmpty(array, "array");
         for (final boolean element : array) {
             if (!element) {
                 return false;
@@ -108,7 +101,6 @@ public class BooleanUtils {
 
     /**
      * <p>Performs an 'and' operation on an array of Booleans.</p>
-     *
      * <pre>
      *   BooleanUtils.and(Boolean.TRUE, Boolean.TRUE)                 = Boolean.TRUE
      *   BooleanUtils.and(Boolean.FALSE, Boolean.FALSE)               = Boolean.FALSE
@@ -116,29 +108,22 @@ public class BooleanUtils {
      *   BooleanUtils.and(Boolean.TRUE, Boolean.TRUE, Boolean.TRUE)   = Boolean.TRUE
      *   BooleanUtils.and(Boolean.FALSE, Boolean.FALSE, Boolean.TRUE) = Boolean.FALSE
      *   BooleanUtils.and(Boolean.TRUE, Boolean.FALSE, Boolean.TRUE)  = Boolean.FALSE
+     *   BooleanUtils.and(null, null)                                 = Boolean.FALSE
      * </pre>
+     * <p>
+     * Null array elements map to false, like {@code Boolean.parseBoolean(null)} and its callers return false.
+     * </p>
      *
      * @param array  an array of {@code Boolean}s
      * @return the result of the logical 'and' operation. That is {@code false}
      * if any of the parameters is {@code false} and {@code true} otherwise.
-     * @throws IllegalArgumentException if {@code array} is {@code null}
+     * @throws NullPointerException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty.
-     * @throws IllegalArgumentException if {@code array} contains a {@code null}
      * @since 3.0.1
      */
     public static Boolean and(final Boolean... array) {
-        if (array == null) {
-            throw new IllegalArgumentException("The Array must not be null");
-        }
-        if (array.length == 0) {
-            throw new IllegalArgumentException("Array is empty");
-        }
-        try {
-            final boolean[] primitive = ArrayUtils.toPrimitive(array);
-            return and(primitive) ? Boolean.TRUE : Boolean.FALSE;
-        } catch (final NullPointerException ex) {
-            throw new IllegalArgumentException("The array must not contain any null elements");
-        }
+        ObjectUtils.requireNonEmpty(array, "array");
+        return and(ArrayUtils.toPrimitive(array)) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     /**
@@ -262,7 +247,6 @@ public class BooleanUtils {
         }
         return bool.booleanValue() ? Boolean.FALSE : Boolean.TRUE;
     }
-
     /**
      * <p>Performs an 'or' operation on a set of booleans.</p>
      *
@@ -277,17 +261,12 @@ public class BooleanUtils {
      *
      * @param array  an array of {@code boolean}s
      * @return {@code true} if any of the arguments is {@code true}, and it returns {@code false} otherwise.
-     * @throws IllegalArgumentException if {@code array} is {@code null}
+     * @throws NullPointerException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty.
      * @since 3.0.1
      */
     public static boolean or(final boolean... array) {
-        if (array == null) {
-            throw new IllegalArgumentException("The Array must not be null");
-        }
-        if (array.length == 0) {
-            throw new IllegalArgumentException("Array is empty");
-        }
+        ObjectUtils.requireNonEmpty(array, "array");
         for (final boolean element : array) {
             if (element) {
                 return true;
@@ -298,7 +277,6 @@ public class BooleanUtils {
 
     /**
      * <p>Performs an 'or' operation on an array of Booleans.</p>
-     *
      * <pre>
      *   BooleanUtils.or(Boolean.TRUE, Boolean.TRUE)                  = Boolean.TRUE
      *   BooleanUtils.or(Boolean.FALSE, Boolean.FALSE)                = Boolean.FALSE
@@ -307,28 +285,22 @@ public class BooleanUtils {
      *   BooleanUtils.or(Boolean.FALSE, Boolean.FALSE, Boolean.TRUE)  = Boolean.TRUE
      *   BooleanUtils.or(Boolean.TRUE, Boolean.FALSE, Boolean.TRUE)   = Boolean.TRUE
      *   BooleanUtils.or(Boolean.FALSE, Boolean.FALSE, Boolean.FALSE) = Boolean.FALSE
+     *   BooleanUtils.or(Boolean.TRUE, null)                          = Boolean.TRUE
+     *   BooleanUtils.or(Boolean.FALSE, null)                         = Boolean.FALSE
      * </pre>
+     * <p>
+     * Null array elements map to false, like {@code Boolean.parseBoolean(null)} and its callers return false.
+     * </p>
      *
      * @param array  an array of {@code Boolean}s
      * @return {@code true} if any of the arguments is {@code true}, and it returns {@code false} otherwise.
-     * @throws IllegalArgumentException if {@code array} is {@code null}
+     * @throws NullPointerException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty.
-     * @throws IllegalArgumentException if {@code array} contains a {@code null}
      * @since 3.0.1
      */
     public static Boolean or(final Boolean... array) {
-        if (array == null) {
-            throw new IllegalArgumentException("The Array must not be null");
-        }
-        if (array.length == 0) {
-            throw new IllegalArgumentException("Array is empty");
-        }
-        try {
-            final boolean[] primitive = ArrayUtils.toPrimitive(array);
-            return or(primitive) ? Boolean.TRUE : Boolean.FALSE;
-        } catch (final NullPointerException ex) {
-            throw new IllegalArgumentException("The array must not contain any null elements");
-        }
+        ObjectUtils.requireNonEmpty(array, "array");
+        return or(ArrayUtils.toPrimitive(array)) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     /**
@@ -489,12 +461,15 @@ public class BooleanUtils {
     public static boolean toBoolean(final String str, final String trueString, final String falseString) {
         if (str == trueString) {
             return true;
-        } else if (str == falseString) {
+        }
+        if (str == falseString) {
             return false;
-        } else if (str != null) {
+        }
+        if (str != null) {
             if (str.equals(trueString)) {
                 return true;
-            } else if (str.equals(falseString)) {
+            }
+            if (str.equals(falseString)) {
                 return false;
             }
         }
@@ -1109,17 +1084,11 @@ public class BooleanUtils {
      *
      * @param array  an array of {@code boolean}s
      * @return the result of the xor operations
-     * @throws IllegalArgumentException if {@code array} is {@code null}
+     * @throws NullPointerException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty.
      */
     public static boolean xor(final boolean... array) {
-        if (array == null) {
-            throw new IllegalArgumentException("The Array must not be null");
-        }
-        if (array.length == 0) {
-            throw new IllegalArgumentException("Array is empty");
-        }
-
+        ObjectUtils.requireNonEmpty(array, "array");
         // false if the neutral element of the xor operator
         boolean result = false;
         for (final boolean element : array) {
@@ -1131,33 +1100,26 @@ public class BooleanUtils {
 
     /**
      * <p>Performs an xor on an array of Booleans.</p>
-     *
      * <pre>
-     *   BooleanUtils.xor(new Boolean[] { Boolean.TRUE, Boolean.TRUE })   = Boolean.FALSE
-     *   BooleanUtils.xor(new Boolean[] { Boolean.FALSE, Boolean.FALSE }) = Boolean.FALSE
-     *   BooleanUtils.xor(new Boolean[] { Boolean.TRUE, Boolean.FALSE })  = Boolean.TRUE
-     *   BooleanUtils.xor(Boolean.TRUE, Boolean.FALSE, Boolean.FALSE)     = Boolean.TRUE
+     *   BooleanUtils.xor(Boolean.TRUE, Boolean.TRUE)                 = Boolean.FALSE
+     *   BooleanUtils.xor(Boolean.FALSE, Boolean.FALSE)               = Boolean.FALSE
+     *   BooleanUtils.xor(Boolean.TRUE, Boolean.FALSE)                = Boolean.TRUE
+     *   BooleanUtils.xor(Boolean.TRUE, Boolean.FALSE, Boolean.FALSE) = Boolean.TRUE
+     *   BooleanUtils.xor(Boolean.FALSE, null)                        = Boolean.FALSE
+     *   BooleanUtils.xor(Boolean.TRUE, null)                         = Boolean.TRUE
      * </pre>
+     * <p>
+     * Null array elements map to false, like {@code Boolean.parseBoolean(null)} and its callers return false.
+     * </p>
      *
      * @param array  an array of {@code Boolean}s
      * @return the result of the xor operations
-     * @throws IllegalArgumentException if {@code array} is {@code null}
+     * @throws NullPointerException if {@code array} is {@code null}
      * @throws IllegalArgumentException if {@code array} is empty.
-     * @throws IllegalArgumentException if {@code array} contains a {@code null}
      */
     public static Boolean xor(final Boolean... array) {
-        if (array == null) {
-            throw new IllegalArgumentException("The Array must not be null");
-        }
-        if (array.length == 0) {
-            throw new IllegalArgumentException("Array is empty");
-        }
-        try {
-            final boolean[] primitive = ArrayUtils.toPrimitive(array);
-            return xor(primitive) ? Boolean.TRUE : Boolean.FALSE;
-        } catch (final NullPointerException ex) {
-            throw new IllegalArgumentException("The array must not contain any null elements");
-        }
+        ObjectUtils.requireNonEmpty(array, "array");
+        return xor(ArrayUtils.toPrimitive(array)) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     /**

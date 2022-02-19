@@ -44,8 +44,10 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.text.WordUtils;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Unit tests for methods of {@link org.apache.commons.lang3.StringUtils}
@@ -63,7 +65,7 @@ public class StringUtilsTest {
     static {
         final StringBuilder ws = new StringBuilder();
         final StringBuilder nws = new StringBuilder();
-        final String hs = String.valueOf(((char) 160));
+        final String hs = String.valueOf((char) 160);
         final StringBuilder tr = new StringBuilder();
         final StringBuilder ntr = new StringBuilder();
         for (int i = 0; i < Character.MAX_VALUE; i++) {
@@ -242,7 +244,6 @@ public class StringUtilsTest {
         assertEquals(str.substring(2), res[1], msg);
     }
 
-    //-----------------------------------------------------------------------
     //Fixed LANG-1463
     @Test
     public void testAbbreviateMarkerWithEmptyString() {
@@ -489,7 +490,6 @@ public class StringUtilsTest {
         assertEquals("'cat'", StringUtils.capitalize("'cat'"));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testCenter_StringInt() {
         assertNull(StringUtils.center(null, -1));
@@ -607,7 +607,6 @@ public class StringUtilsTest {
         }
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testConstructor() {
         assertNotNull(new StringUtils());
@@ -618,7 +617,6 @@ public class StringUtilsTest {
         assertFalse(Modifier.isFinal(StringUtils.class.getModifiers()));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testDefault_String() {
         assertEquals("", StringUtils.defaultString(null));
@@ -787,7 +785,6 @@ public class StringUtilsTest {
         assertEquals("test", StringUtils.deleteWhitespace("\u000Bt  \t\n\u0009e\rs\n\n   \tt"));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testDifference_StringString() {
         assertNull(StringUtils.difference(null, null));
@@ -993,7 +990,6 @@ public class StringUtilsTest {
         assertThrows(IllegalArgumentException.class, () -> StringUtils.getLevenshteinDistance("a", null, 0));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testGetLevenshteinDistance_StringString() {
         assertEquals(0, StringUtils.getLevenshteinDistance("", ""));
@@ -1235,7 +1231,7 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testJoin_ArrayString() {
+    public void testJoin_ArrayString_EmptyDelimiter() {
         assertNull(StringUtils.join((Object[]) null, null));
         assertEquals(TEXT_LIST_NOSEP, StringUtils.join(ARRAY_LIST, null));
         assertEquals(TEXT_LIST_NOSEP, StringUtils.join(ARRAY_LIST, ""));
@@ -1244,18 +1240,24 @@ public class StringUtilsTest {
 
         assertEquals("", StringUtils.join(EMPTY_ARRAY_LIST, null));
         assertEquals("", StringUtils.join(EMPTY_ARRAY_LIST, ""));
-        assertEquals("", StringUtils.join(EMPTY_ARRAY_LIST, SEPARATOR));
 
-        assertEquals(TEXT_LIST, StringUtils.join(ARRAY_LIST, SEPARATOR));
-        assertEquals(",,foo", StringUtils.join(MIXED_ARRAY_LIST, SEPARATOR));
-        assertEquals("foo,2", StringUtils.join(MIXED_TYPE_LIST, SEPARATOR));
-
-        assertEquals("/", StringUtils.join(MIXED_ARRAY_LIST, "/", 0, MIXED_ARRAY_LIST.length - 1));
         assertEquals("", StringUtils.join(MIXED_ARRAY_LIST, "", 0, MIXED_ARRAY_LIST.length - 1));
-        assertEquals("foo", StringUtils.join(MIXED_TYPE_LIST, "/", 0, 1));
-        assertEquals("foo/2", StringUtils.join(MIXED_TYPE_LIST, "/", 0, 2));
-        assertEquals("2", StringUtils.join(MIXED_TYPE_LIST, "/", 1, 2));
-        assertEquals("", StringUtils.join(MIXED_TYPE_LIST, "/", 2, 1));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {",", ";", Supplementary.CharU20000, Supplementary.CharU20001})
+    public void testJoin_ArrayString_NonEmptyDelimiter(final String delimiter) {
+        assertEquals("", StringUtils.join(EMPTY_ARRAY_LIST, delimiter));
+
+        assertEquals(String.join(delimiter, ARRAY_LIST), StringUtils.join(ARRAY_LIST, delimiter));
+        assertEquals(delimiter + delimiter + "foo", StringUtils.join(MIXED_ARRAY_LIST, delimiter));
+        assertEquals(String.join(delimiter, "foo", "2"), StringUtils.join(MIXED_TYPE_LIST, delimiter));
+
+        assertEquals(delimiter, StringUtils.join(MIXED_ARRAY_LIST, delimiter, 0, MIXED_ARRAY_LIST.length - 1));
+        assertEquals("foo", StringUtils.join(MIXED_TYPE_LIST, delimiter, 0, 1));
+        assertEquals(String.join(delimiter, "foo", "2"), StringUtils.join(MIXED_TYPE_LIST, delimiter, 0, 2));
+        assertEquals("2", StringUtils.join(MIXED_TYPE_LIST, delimiter, 1, 2));
+        assertEquals("", StringUtils.join(MIXED_TYPE_LIST, delimiter, 2, 1));
     }
 
     @Test
@@ -1313,7 +1315,7 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testJoin_List() {
+    public void testJoin_List_EmptyDelimiter() {
         assertNull(StringUtils.join((List<String>) null, null));
         assertEquals(TEXT_LIST_NOSEP, StringUtils.join(STRING_LIST, null));
         assertEquals(TEXT_LIST_NOSEP, StringUtils.join(STRING_LIST, ""));
@@ -1322,26 +1324,35 @@ public class StringUtilsTest {
 
         assertEquals("", StringUtils.join(EMPTY_STRING_LIST, null));
         assertEquals("", StringUtils.join(EMPTY_STRING_LIST, ""));
-        assertEquals("", StringUtils.join(EMPTY_STRING_LIST, SEPARATOR));
 
-        assertEquals(TEXT_LIST, StringUtils.join(STRING_LIST, SEPARATOR));
-        assertEquals(",,foo", StringUtils.join(MIXED_STRING_LIST, SEPARATOR));
-        assertEquals("foo,2", StringUtils.join(MIXED_TYPE_OBJECT_LIST, SEPARATOR));
-
-        assertEquals("/", StringUtils.join(MIXED_STRING_LIST, "/", 0, MIXED_STRING_LIST.size() - 1));
         assertEquals("", StringUtils.join(MIXED_STRING_LIST, "", 0, MIXED_STRING_LIST.size()- 1));
-        assertEquals("foo", StringUtils.join(MIXED_TYPE_OBJECT_LIST, "/", 0, 1));
-        assertEquals("foo/2", StringUtils.join(MIXED_TYPE_OBJECT_LIST, "/", 0, 2));
-        assertEquals("2", StringUtils.join(MIXED_TYPE_OBJECT_LIST, "/", 1, 2));
-        assertEquals("", StringUtils.join(MIXED_TYPE_OBJECT_LIST, "/", 2, 1));
-        assertNull(null, StringUtils.join((List<?>) null, "/", 0, 1));
+    }
 
+    @Test
+    public void testJoin_List_CharDelimiter() {
         assertEquals("/", StringUtils.join(MIXED_STRING_LIST, '/', 0, MIXED_STRING_LIST.size() - 1));
         assertEquals("foo", StringUtils.join(MIXED_TYPE_OBJECT_LIST, '/', 0, 1));
         assertEquals("foo/2", StringUtils.join(MIXED_TYPE_OBJECT_LIST, '/', 0, 2));
         assertEquals("2", StringUtils.join(MIXED_TYPE_OBJECT_LIST, '/', 1, 2));
         assertEquals("", StringUtils.join(MIXED_TYPE_OBJECT_LIST, '/', 2, 1));
         assertNull(null, StringUtils.join((List<?>) null, '/', 0, 1));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {",", ";", Supplementary.CharU20000, Supplementary.CharU20001})
+    public void testJoin_List_NonEmptyDelimiter(final String delimiter) {
+        assertEquals("", StringUtils.join(EMPTY_STRING_LIST, delimiter));
+
+        assertEquals(String.join(delimiter, STRING_LIST), StringUtils.join(STRING_LIST, delimiter));
+        assertEquals(delimiter + delimiter + "foo", StringUtils.join(MIXED_STRING_LIST, delimiter));
+        assertEquals(String.join(delimiter, "foo", "2"), StringUtils.join(MIXED_TYPE_OBJECT_LIST, delimiter));
+
+        assertEquals(delimiter, StringUtils.join(MIXED_STRING_LIST, delimiter, 0, MIXED_STRING_LIST.size() - 1));
+        assertEquals("foo", StringUtils.join(MIXED_TYPE_OBJECT_LIST, delimiter, 0, 1));
+        assertEquals(String.join(delimiter, "foo", "2"), StringUtils.join(MIXED_TYPE_OBJECT_LIST, delimiter, 0, 2));
+        assertEquals("2", StringUtils.join(MIXED_TYPE_OBJECT_LIST, delimiter, 1, 2));
+        assertEquals("", StringUtils.join(MIXED_TYPE_OBJECT_LIST, delimiter, 2, 1));
+        assertNull(null, StringUtils.join((List<?>) null, delimiter, 0, 1));
     }
 
     @Test
@@ -1364,13 +1375,12 @@ public class StringUtilsTest {
     @Disabled
     @Test
     public void testLang1593() {
-        final int[] arr = new int[] {1, 2, 3, 4, 5, 6, 7};
+        final int[] arr = {1, 2, 3, 4, 5, 6, 7};
         final String expected = StringUtils.join(arr, '-');
         final String actual = StringUtils.join(arr, "-");
         assertEquals(expected, actual);
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testJoin_Objects() {
         assertEquals("abc", StringUtils.join("a", "b", "c"));
@@ -1378,15 +1388,16 @@ public class StringUtilsTest {
         assertNull(StringUtils.join((Object[]) null));
     }
 
-    @Test
-    public void testJoinWith() {
-        assertEquals("", StringUtils.joinWith(","));        // empty array
-        assertEquals("", StringUtils.joinWith(",", (Object[]) NULL_ARRAY_LIST));
-        assertEquals("null", StringUtils.joinWith(",", NULL_TO_STRING_LIST));   //toString method prints 'null'
+    @ParameterizedTest
+    @ValueSource(strings = {",", ";", Supplementary.CharU20000, Supplementary.CharU20001})
+    public void testJoinWith(final String delimiter) {
+        assertEquals("", StringUtils.joinWith(delimiter)); // empty array
+        assertEquals("", StringUtils.joinWith(delimiter, (Object[]) NULL_ARRAY_LIST));
+        assertEquals("null", StringUtils.joinWith(delimiter, NULL_TO_STRING_LIST)); // toString method prints 'null'
 
-        assertEquals("a,b,c", StringUtils.joinWith(",", "a", "b", "c"));
-        assertEquals(",a,", StringUtils.joinWith(",", null, "a", ""));
-        assertEquals(",a,", StringUtils.joinWith(",", "", "a", ""));
+        assertEquals(String.join(delimiter, "a", "b", "c"), StringUtils.joinWith(delimiter, "a", "b", "c"));
+        assertEquals(String.join(delimiter, "", "a", ""), StringUtils.joinWith(delimiter, null, "a", ""));
+        assertEquals(String.join(delimiter, "", "a", ""), StringUtils.joinWith(delimiter, "", "a", ""));
 
         assertEquals("ab", StringUtils.joinWith(null, "a", "b"));
     }
@@ -1408,7 +1419,6 @@ public class StringUtilsTest {
         assertEquals("121", StringUtils.stripEnd("121.00", ".0"));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testLeftPad_StringInt() {
         assertNull(StringUtils.leftPad(null, 5));
@@ -1802,7 +1812,23 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testRemoveStart() {
+    public void testRemoveStartChar() {
+        // StringUtils.removeStart("", *)        = ""
+        assertNull(StringUtils.removeStart(null, '\0'));
+        assertNull(StringUtils.removeStart(null, 'a'));
+
+        // StringUtils.removeStart(*, null)      = *
+        assertEquals(StringUtils.removeStart("", '\0'), "");
+        assertEquals(StringUtils.removeStart("", 'a'), "");
+
+        // All others:
+        assertEquals(StringUtils.removeStart("/path", '/'), "path");
+        assertEquals(StringUtils.removeStart("path", '/'), "path");
+        assertEquals(StringUtils.removeStart("path", '\0'), "path");
+    }
+
+    @Test
+    public void testRemoveStartString() {
         // StringUtils.removeStart("", *)        = ""
         assertNull(StringUtils.removeStart(null, null));
         assertNull(StringUtils.removeStart(null, ""));
@@ -2228,7 +2254,6 @@ public class StringUtilsTest {
                      StringUtils.replacePattern("Lorem ipsum  dolor   sit", "( +)([a-z]+)", "_$2"));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testReverse_String() {
         assertNull(StringUtils.reverse(null));
@@ -2245,7 +2270,6 @@ public class StringUtilsTest {
         assertEquals("", StringUtils.reverseDelimited("", '.'));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testRightPad_StringInt() {
         assertNull(StringUtils.rightPad(null, 5));
@@ -2282,7 +2306,6 @@ public class StringUtilsTest {
         assertEquals("abc  ", StringUtils.rightPad("abc", 5, ""));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testRotate_StringInt() {
         assertNull(StringUtils.rotate(null, 1));
@@ -2443,7 +2466,7 @@ public class StringUtilsTest {
 
         // test whitespace
         String input = "ab   de fg";
-        String[] expected = new String[]{"ab", "", "", "de", "fg"};
+        String[] expected = {"ab", "", "", "de", "fg"};
 
         String[] actual = StringUtils.splitByWholeSeparatorPreserveAllTokens(input, null);
         assertEquals(expected.length, actual.length);
@@ -2480,7 +2503,7 @@ public class StringUtilsTest {
 
         // test whitespace
         String input = "ab   de fg";
-        String[] expected = new String[]{"ab", "", "", "de", "fg"};
+        String[] expected = {"ab", "", "", "de", "fg"};
 
         String[] actual = StringUtils.splitByWholeSeparatorPreserveAllTokens(input, null, -1);
         assertEquals(expected.length, actual.length);
@@ -2755,7 +2778,7 @@ public class StringUtilsTest {
 
         // Match example in javadoc
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"a", "", "b", "c"};
             results = StringUtils.splitPreserveAllTokens("a..b.c", '.');
             assertEquals(expectedResults.length, results.length);
@@ -2784,7 +2807,7 @@ public class StringUtilsTest {
         }
 
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"ab", "de fg"};
             results = StringUtils.splitPreserveAllTokens("ab de fg", null, 2);
             assertEquals(expectedResults.length, results.length);
@@ -2794,7 +2817,7 @@ public class StringUtilsTest {
         }
 
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"ab", "  de fg"};
             results = StringUtils.splitPreserveAllTokens("ab   de fg", null, 2);
             assertEquals(expectedResults.length, results.length);
@@ -2804,7 +2827,7 @@ public class StringUtilsTest {
         }
 
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"ab", "::de:fg"};
             results = StringUtils.splitPreserveAllTokens("ab:::de:fg", ":", 2);
             assertEquals(expectedResults.length, results.length);
@@ -2814,7 +2837,7 @@ public class StringUtilsTest {
         }
 
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"ab", "", " de fg"};
             results = StringUtils.splitPreserveAllTokens("ab   de fg", null, 3);
             assertEquals(expectedResults.length, results.length);
@@ -2824,7 +2847,7 @@ public class StringUtilsTest {
         }
 
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"ab", "", "", "de fg"};
             results = StringUtils.splitPreserveAllTokens("ab   de fg", null, 4);
             assertEquals(expectedResults.length, results.length);
@@ -2835,7 +2858,7 @@ public class StringUtilsTest {
 
         {
             final String[] expectedResults = {"ab", "cd:ef"};
-            String[] results;
+            final String[] results;
             results = StringUtils.splitPreserveAllTokens("ab:cd:ef", ":", 2);
             assertEquals(expectedResults.length, results.length);
             for (int i = 0; i < expectedResults.length; i++) {
@@ -2844,7 +2867,7 @@ public class StringUtilsTest {
         }
 
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"ab", ":cd:ef"};
             results = StringUtils.splitPreserveAllTokens("ab::cd:ef", ":", 2);
             assertEquals(expectedResults.length, results.length);
@@ -2854,7 +2877,7 @@ public class StringUtilsTest {
         }
 
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"ab", "", ":cd:ef"};
             results = StringUtils.splitPreserveAllTokens("ab:::cd:ef", ":", 3);
             assertEquals(expectedResults.length, results.length);
@@ -2864,7 +2887,7 @@ public class StringUtilsTest {
         }
 
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"ab", "", "", "cd:ef"};
             results = StringUtils.splitPreserveAllTokens("ab:::cd:ef", ":", 4);
             assertEquals(expectedResults.length, results.length);
@@ -2874,7 +2897,7 @@ public class StringUtilsTest {
         }
 
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"", "ab", "", "", "cd:ef"};
             results = StringUtils.splitPreserveAllTokens(":ab:::cd:ef", ":", 5);
             assertEquals(expectedResults.length, results.length);
@@ -2884,7 +2907,7 @@ public class StringUtilsTest {
         }
 
         {
-            String[] results;
+            final String[] results;
             final String[] expectedResults = {"", "", "ab", "", "", "cd:ef"};
             results = StringUtils.splitPreserveAllTokens("::ab:::cd:ef", ":", 6);
             assertEquals(expectedResults.length, results.length);
@@ -2921,8 +2944,7 @@ public class StringUtilsTest {
                 // don't actively test for that.
                 final Class<?>[] params = m.getParameterTypes();
                 if (params.length > 0 && (params[0] == CharSequence.class || params[0] == CharSequence[].class)) {
-                    assertTrue(!ArrayUtils.contains(excludeMethods, methodStr),
-                            "The method \"" + methodStr + "\" appears to be mutable in spirit and therefore must not accept a CharSequence");
+                    assertFalse(ArrayUtils.contains(excludeMethods, methodStr), "The method \"" + methodStr + "\" appears to be mutable in spirit and therefore must not accept a CharSequence");
                 }
             } else {
                 // Assume this is immutable in spirit and ensure the first parameter is not String.
@@ -3010,7 +3032,6 @@ public class StringUtilsTest {
         assertEquals(expectedString, StringUtils.toString(expectedBytes, encoding));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testTruncate_StringInt() {
         assertNull(StringUtils.truncate(null, 12));
@@ -3300,7 +3321,7 @@ public class StringUtilsTest {
 
     @Test
     public void testToRootLowerCase() {
-        assertEquals(null, StringUtils.toRootLowerCase(null));
+        assertNull(StringUtils.toRootLowerCase(null));
         assertEquals("a", StringUtils.toRootLowerCase("A"));
         assertEquals("a", StringUtils.toRootLowerCase("a"));
         final Locale TURKISH = Locale.forLanguageTag("tr");
@@ -3320,7 +3341,7 @@ public class StringUtilsTest {
 
     @Test
     public void testToRootUpperCase() {
-        assertEquals(null, StringUtils.toRootUpperCase(null));
+        assertNull(StringUtils.toRootUpperCase(null));
         assertEquals("A", StringUtils.toRootUpperCase("a"));
         assertEquals("A", StringUtils.toRootUpperCase("A"));
         final Locale TURKISH = Locale.forLanguageTag("tr");
@@ -3340,13 +3361,13 @@ public class StringUtilsTest {
 
     @Test
     public void testGeorgianSample() {
-        final char[] arrayI = new char[]{
+        final char[] arrayI = {
                 //Latin Small Letter dotless I
                 (char) 0x0131,
                 //Greek Capital Letter Theta
                 (char) 0x03F4
         };
-        final char[] arrayJ = new char[]{
+        final char[] arrayJ = {
                 //Latin Capital Letter I with dot above
                 (char) 0x0130,
                 //Greek Theta Symbol

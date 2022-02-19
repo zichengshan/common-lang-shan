@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -266,14 +266,11 @@ public class EventListenerSupport<L> implements Serializable {
      */
     private void readObject(final ObjectInputStream objectInputStream) throws IOException, ClassNotFoundException {
         @SuppressWarnings("unchecked") // Will throw CCE here if not correct
-        final
-        L[] srcListeners = (L[]) objectInputStream.readObject();
+        final L[] srcListeners = (L[]) objectInputStream.readObject();
 
         this.listeners = new CopyOnWriteArrayList<>(srcListeners);
 
-        @SuppressWarnings("unchecked") // Will throw CCE here if not correct
-        final
-        Class<L> listenerInterface = (Class<L>) srcListeners.getClass().getComponentType();
+        final Class<L> listenerInterface = ArrayUtils.getComponentType(srcListeners);
 
         initializeTransientFields(listenerInterface, Thread.currentThread().getContextClassLoader());
     }
@@ -284,10 +281,8 @@ public class EventListenerSupport<L> implements Serializable {
      * @param classLoader the class loader to be used
      */
     private void initializeTransientFields(final Class<L> listenerInterface, final ClassLoader classLoader) {
-        @SuppressWarnings("unchecked") // Will throw CCE here if not correct
-        final
-        L[] array = (L[]) Array.newInstance(listenerInterface, 0);
-        this.prototypeArray = array;
+        // Will throw CCE here if not correct
+        this.prototypeArray = ArrayUtils.newInstance(listenerInterface, 0);
         createProxy(listenerInterface, classLoader);
     }
 
