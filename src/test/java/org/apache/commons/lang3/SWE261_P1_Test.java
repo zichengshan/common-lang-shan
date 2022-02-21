@@ -18,7 +18,6 @@ package org.apache.commons.lang3;
 
 import org.junit.jupiter.api.Test;
 import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
