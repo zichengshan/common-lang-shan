@@ -14,28 +14,28 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# language: java
-# cache:
-#   directories:
-#     - $HOME/.m2
-# jdk:
-#   - openjdk9
+ language: java
+ cache:
+   directories:
+     - $HOME/.m2
+ jdk:
+   - openjdk11
   
 
-# matrix:
-#   allow_failures:
-#     - jdk: openjdk-ea
-# script:
-#   - mvn -V --no-transfer-progress
+ matrix:
+   allow_failures:
+     - jdk: openjdk-ea
+ script:
+   - mvn -V --no-transfer-progress
 
-# after_success:
-#   - mvn -V --no-transfer-progress clean test jacoco:report coveralls:report -Ptravis-jacoco javadoc:javadoc -Ddoclint=all
+ after_success:
+   - mvn -V --no-transfer-progress clean test jacoco:report coveralls:report -Ptravis-jacoco javadoc:javadoc -Ddoclint=all
 
-language: java
+#language: java
 #dist: xenial
 #sudo: required
-jdk:
-  - openjdk11
+#jdk:
+#  - openjdk11
   
 # script:
 #   - mvn clean install -DskipTests -Drat.skip=true
