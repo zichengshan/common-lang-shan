@@ -17,8 +17,7 @@
 package org.apache.commons.lang3;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SWE261_P2_Test {
 
@@ -67,6 +66,4 @@ public class SWE261_P2_Test {
         ArrayUtils.swap(a, 2, 0);
         assertEquals("{aaa,bbb,ccc}", ArrayUtils.toString(a));
     }
-
-
 }
