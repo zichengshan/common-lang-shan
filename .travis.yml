@@ -34,9 +34,6 @@
 language: java
 #dist: xenial
 #sudo: required
-install: true
-script:
-  - mvn install
 jdk:
   - openjdk11
   
