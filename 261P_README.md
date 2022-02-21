@@ -1,4 +1,0 @@
-
-MSWE 261P SOFTWARE TESTING AND DEBUGGING - GROUP PR0JECT
-
-Goup Members: Chenxu Wang, Zicheng Shan
