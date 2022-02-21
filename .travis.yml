@@ -32,8 +32,8 @@
 #   - mvn -V --no-transfer-progress clean test jacoco:report coveralls:report -Ptravis-jacoco javadoc:javadoc -Ddoclint=all
 
 language: java
-dist: xenial
-sudo: required
+#dist: xenial
+#sudo: required
 
 jdk:
   - openjdk11
@@ -41,5 +41,5 @@ jdk:
 # script:
 #   - mvn clean install -DskipTests -Drat.skip=true
 
-script:
-  - mvn clean install -Drat.numUnapprovedLicenses=100
+#script:
+#  - mvn clean install -Drat.numUnapprovedLicenses=100
